@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "998918922748",
+    "project_id": "arasu-fm-8b744",
+    "storage_bucket": "arasu-fm-8b744.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:998918922748:android:9faf776e6efb86b2f95279",
+        "android_client_info": {
+          "package_name": "com.example.arasu_fm"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoWFxG9i1PiTnlKeWXZTrZQR4VKSdLE1I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
