@@ -3,12 +3,14 @@ import 'package:arasu_fm/Pages/about_fm.dart';
 import 'package:arasu_fm/Pages/bug_report.dart';
 import 'package:arasu_fm/Pages/fm_team.dart';
 import 'package:arasu_fm/Pages/onboarding.dart';
+import 'package:arasu_fm/Providers/audio_provider.dart';
 import 'package:arasu_fm/model/share_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:provider/provider.dart'; // Add this line
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -29,6 +31,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> logout() async {
     try {
+      // Ensure the audio player stops and releases resources before logging out
+      final audioProvider = Provider.of<AudioProvider>(context, listen: false);
+      if (audioProvider.isPlaying) {
+        await audioProvider.audioPlayer.stop(); // Stop the audio
+      }
+
       if (currentUser != null) {
         for (var provider in currentUser!.providerData) {
           if (provider.providerId == 'google.com') {
@@ -44,8 +52,11 @@ class _ProfilePageState extends State<ProfilePage> {
       await _auth.signOut();
       print('Firebase user logged out');
 
+      // Navigate to the onboarding screen
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Onboarding()));
+        context,
+        MaterialPageRoute(builder: (context) => Onboarding()),
+      );
     } catch (e) {
       print('Error during logout: $e');
       ScaffoldMessenger.of(context).showSnackBar(

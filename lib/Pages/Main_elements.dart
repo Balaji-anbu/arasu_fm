@@ -1,13 +1,16 @@
 import 'dart:async';
-import 'package:arasu_fm/model/scroll_text.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:arasu_fm/model/scroll_text.dart';
 import 'package:arasu_fm/Pages/audio_data.dart';
 import 'package:arasu_fm/Pages/audio_stream.dart';
 import 'package:arasu_fm/Providers/audio_provider.dart';
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/services.dart'; // Add this line
+import 'package:flutter/widgets.dart'; // Add this line
 
 class HomePageContent extends StatefulWidget {
   const HomePageContent({super.key});
@@ -16,18 +19,23 @@ class HomePageContent extends StatefulWidget {
   State<HomePageContent> createState() => _HomePageContentState();
 }
 
-class _HomePageContentState extends State<HomePageContent>
-    with SingleTickerProviderStateMixin {
+class _HomePageContentState extends State<HomePageContent> {
   List<AudioData> _audioList = [];
   List<String> _sliderImages = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchAudioData(); // Fetch audio data from Firestore
-    loadSliderImages(); // Fetch slider images
+    _simulateLoading(); // Simulate loading for 2 seconds
+  }
 
-    // Initialize Animation Controller for scrolling text
+  Future<void> _simulateLoading() async {
+    await Future.delayed(const Duration(seconds: 3)); // Show shimmer for 2 seconds
+    await Future.wait([_fetchAudioData(), loadSliderImages()]); // Load data
+    setState(() {
+      _isLoading = false; // Stop shimmer after data is loaded
+    });
   }
 
   Future<List<String>> fetchSliderImages() async {
@@ -82,14 +90,69 @@ class _HomePageContentState extends State<HomePageContent>
     }
   }
 
+  void _showTutorialPopup(GlobalKey key) {
+    final RenderBox renderBox = key.currentContext!.findRenderObject() as RenderBox;
+    final position = renderBox.localToGlobal(Offset.zero);
+    final size = renderBox.size;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Stack(
+          children: [
+            Positioned(
+              left: position.dx + size.width / 2 -180,
+              top: position.dy + size.height ,
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  width: 200,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[900],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Listening Podcasts',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'metropolis',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'You are currently listening to a podcast.',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'metropolis',
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Lottie.asset("assets/tab.json"),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final audioProvider = Provider.of<AudioProvider>(context);
+    final GlobalKey animationKey = GlobalKey(); // Add this line
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 2, 15, 27),
-      appBar: AppBar(
+      appBar: AppBar(toolbarHeight: 70,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: const [
@@ -112,23 +175,39 @@ class _HomePageContentState extends State<HomePageContent>
           ],
         ),
         backgroundColor: const Color(0xff213555),
+        actions: audioProvider.isPlaying
+            ? [
+                GestureDetector(
+                  key: animationKey, // Add this line
+                  onTap: () => _showTutorialPopup(animationKey), // Modify this line
+                  child: Lottie.asset("assets/tab.json"),
+                ),
+                SizedBox(width: 10),
+              ]
+            : [],
       ),
-      body: _sliderImages.isEmpty
-          ? Center(
-              child: Lottie.asset('assets/loading.json'),
-            )
-          : SingleChildScrollView(
-              child: Column(
-                children: [
-                  const SizedBox(height: 15),
-                  CarouselSlider(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 15),
+            _isLoading
+                ? Shimmer.fromColors(
+                    baseColor: Colors.grey[700]!,
+                    highlightColor: Colors.grey[500]!,
+                    child: Container(
+                      height: screenSize.height * 0.25,
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                  )
+                : CarouselSlider(
                     options: CarouselOptions(
-                      height: screenSize.height * 0.250,
+                      height: screenSize.height * 0.25,
                       autoPlay: true,
                       enlargeCenterPage: true,
-                      onPageChanged: (index, reason) {
-                        setState(() {});
-                      },
                     ),
                     items: _sliderImages.map((imageUrl) {
                       return Builder(
@@ -148,37 +227,54 @@ class _HomePageContentState extends State<HomePageContent>
                       );
                     }).toList(),
                   ),
-                  const SizedBox(height: 10),
-                  ScrollingTextWithGradient(
-                    text:
-                        "Podcasts From: Arasu Engineering College, Kumbakonam.",
-                    duration: const Duration(seconds: 15),
-                    gradientColors: [
-                      Colors.blue.shade300,
-                      Colors.purple.shade400,
-                      Colors.pink.shade300,
-                    ],
+            const SizedBox(height: 10),
+            ScrollingTextWithGradient(
+              text: "Podcasts From: Arasu Engineering College, Kumbakonam.",
+              duration: const Duration(seconds: 15),
+              gradientColors: [
+                Colors.blue.shade300,
+                Colors.purple.shade400,
+                Colors.pink.shade300,
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: const [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10.0),
+                  child: Text(
+                    'New Podcasts',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'metropolis',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
                   ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: const [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text(
-                          'New Podcasts',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'metropolis',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            _isLoading
+                ? Shimmer.fromColors(
+                    baseColor: Colors.grey[700]!,
+                    highlightColor: Colors.grey[500]!,
+                    child: Row(
+                      children: List.generate(6, (index) {
+                        return Container(
+                          width: 120,
+                          height: 120,
+                          margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.grey[800],
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  SingleChildScrollView(
+                        );
+                      }),
+                    ),
+                  )
+                : SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,25 +335,43 @@ class _HomePageContentState extends State<HomePageContent>
                           .toList(),
                     ),
                   ),
-                  const SizedBox(height: 30),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: const [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text(
-                          'Other Podcasts',
-                          style: TextStyle(
-                            fontFamily: 'metropolis',
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
+            const SizedBox(height: 30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: const [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10.0),
+                  child: Text(
+                    'Other Podcasts',
+                    style: TextStyle(
+                      fontFamily: 'metropolis',
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
-                  ListView.builder(
+                ),
+              ],
+            ),
+            _isLoading
+                ? Shimmer.fromColors(
+                    baseColor: Colors.grey[700]!,
+                    highlightColor: Colors.grey[500]!,
+                    child: Column(
+                      children: List.generate(5, (index) {
+                        return Container(
+                          height: 80,
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 8.0, horizontal: 10.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.grey[800],
+                          ),
+                        );
+                      }),
+                    ),
+                  )
+                : ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemCount:
@@ -312,10 +426,10 @@ class _HomePageContentState extends State<HomePageContent>
                       );
                     },
                   ),
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
     );
   }
 }

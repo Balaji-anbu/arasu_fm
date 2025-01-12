@@ -7,7 +7,7 @@ class AboutPage extends StatelessWidget {
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.white),
         title: Text(
-          'About Us',
+          'About us',
           style: TextStyle(
               color: Colors.white,
               fontFamily: 'metropolis',
