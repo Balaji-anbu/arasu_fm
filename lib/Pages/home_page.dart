@@ -1,11 +1,11 @@
+import 'package:arasu_fm/Pages/Main_elements.dart';
+import 'package:arasu_fm/Pages/audio_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:arasu_fm/Providers/audio_provider.dart';
-import 'package:arasu_fm/Pages/audio_stream.dart';
 import 'package:arasu_fm/Pages/video_page.dart';
 import 'package:arasu_fm/Pages/library_page.dart';
 import 'package:arasu_fm/Pages/profile_page.dart';
-import 'package:arasu_fm/Pages/Main_elements.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   final List<Widget> _pages = [
-    HomePageContent(),
+    HomePageContent(), // Placeholder for the home page content
     VideoPage(),
     LikedPodcastPage(),
     ProfilePage(),
@@ -42,26 +42,42 @@ class _HomePageState extends State<HomePage> {
             index: _selectedIndex,
             children: _pages,
           ),
-          // Always show the overlay if there is an active audio
-          Positioned(
-            bottom: 68,
-            left: 10,
-            right: 10,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AudioPlayerPage(
-                      audioUrl: audioProvider.currentAudio?.audioUrl ?? "",
-                      audioData: audioProvider.currentAudio!,
-                    ),
-                  ),
-                );
-              },
-              child: AudioPlayerOverlay(audioProvider: audioProvider),
+          // Overlay showing current audio if any
+          if (audioProvider.currentAudio != null)
+            Positioned(
+              bottom: 68,
+              left: 10,
+              right: 10,
+              child: GestureDetector(
+               onTap: () {
+  Navigator.push(
+    context,
+    PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => AudioPlayerPage(
+        audioUrl: audioProvider.currentAudio!.audioUrl,
+        audioData: audioProvider.currentAudio!,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(0.0, 1.0); // Start from bottom
+        const end = Offset.zero;       // End at the center (normal position)
+        const curve = Curves.easeInOut;
+
+        final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        final offsetAnimation = animation.drive(tween);
+
+        return SlideTransition(
+          position: offsetAnimation,
+          child: child,
+        );
+      },
+    ),
+  );
+},
+
+                child: AudioPlayerOverlay(audioProvider: audioProvider),
+              ),
             ),
-          ),
+          // Bottom navigation bar
           BottomNavigationBarWidget(
             selectedIndex: _selectedIndex,
             onItemTapped: _onItemTapped,
@@ -75,27 +91,46 @@ class _HomePageState extends State<HomePage> {
 class AudioPlayerOverlay extends StatefulWidget {
   final AudioProvider audioProvider;
 
-  const AudioPlayerOverlay({required this.audioProvider, Key? key})
-      : super(key: key);
+  const AudioPlayerOverlay({required this.audioProvider, Key? key}) : super(key: key);
 
   @override
   _AudioPlayerOverlayState createState() => _AudioPlayerOverlayState();
 }
 
-class _AudioPlayerOverlayState extends State<AudioPlayerOverlay> {
+class _AudioPlayerOverlayState extends State<AudioPlayerOverlay> with SingleTickerProviderStateMixin {
+  late AnimationController _rotationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _rotationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 5),
+    );
+  }
+
+  @override
+  void dispose() {
+    _rotationController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final audioProvider = widget.audioProvider; // Accessing audioProvider
+    final audioProvider = widget.audioProvider;
+
+    if (audioProvider.isPlaying) {
+      if (!_rotationController.isAnimating) {
+        _rotationController.repeat();
+      }
+    } else {
+      _rotationController.stop();
+    }
 
     return Container(
-      key: ValueKey(
-          audioProvider.currentAudio?.title), // Add Key to prevent rebuild
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            const Color.fromARGB(255, 1, 73, 38),
-            const Color.fromARGB(255, 95, 6, 105)
-          ],
+          colors: [Colors.black87, Colors.grey.shade900],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -104,82 +139,57 @@ class _AudioPlayerOverlayState extends State<AudioPlayerOverlay> {
           BoxShadow(
             color: Colors.black.withOpacity(0.5),
             blurRadius: 8,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(3),
+      padding: const EdgeInsets.all(8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Album Art
-          Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  audioProvider.currentAudio?.imageUrl ??
-                      "https://static.vecteezy.com/system/resources/thumbnails/000/583/157/small/wave_sound-15.jpg",
-                  height: 50,
-                  width: 45,
-                  fit: BoxFit.cover,
-                ),
+          // Rotating album art
+          AnimatedBuilder(
+            animation: _rotationController,
+            child: CircleAvatar(
+              radius: 25,
+              backgroundImage: NetworkImage(
+                audioProvider.currentAudio?.imageUrl ??
+                    "https://static.vecteezy.com/system/resources/thumbnails/000/583/157/small/wave_sound-15.jpg",
               ),
-              const SizedBox(width: 10),
-              // Song Title and Artist
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width *
-                        0.4, // Adjust width to prevent overflow
-                    child: Text(
-                      audioProvider.currentAudio?.title ?? "Start Playing..",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'metropolis',
-                      ),
-                      overflow:
-                          TextOverflow.ellipsis, // Add ellipsis for long text
-                    ),
-                  ),
-                ],
-              ),
-            ],
+            ),
+            builder: (context, child) {
+              return Transform.rotate(
+                angle: _rotationController.value * 2.0 * 3.14159,
+                child: child,
+              );
+            },
           ),
-          // Controls (like, pause/play)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              IconButton(
-                icon: const Icon(
-                  Icons.skip_previous,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  audioProvider.playPrevious(); // Custom next track logic
-                },
+          const SizedBox(width: 10),
+          // Audio details
+          Expanded(
+            child: Text(
+              audioProvider.currentAudio?.title ?? "Playing...",
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          // Play/Pause and Next buttons
+          Row(
+            children: [
               IconButton(
                 icon: Icon(
                   audioProvider.isPlaying ? Icons.pause : Icons.play_arrow,
                   color: Colors.white,
                 ),
-                onPressed: () {
-                  audioProvider.togglePlayPause(); // Custom play/pause logic
-                  setState(() {}); // Force update to ensure UI is refreshed
-                },
+                onPressed: audioProvider.togglePlayPause,
               ),
               IconButton(
-                icon: const Icon(
-                  Icons.skip_next,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  audioProvider.playNext(); // Custom next track logic
-                },
+                icon: const Icon(Icons.skip_next, color: Colors.white),
+                onPressed: audioProvider.playNext,
               ),
             ],
           ),
@@ -207,14 +217,17 @@ class BottomNavigationBarWidget extends StatelessWidget {
       right: 0,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(1),
-          borderRadius: const BorderRadius.all(Radius.circular(10)),
+          color: Colors.black,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(10),
+            topRight: Radius.circular(10),
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(1),
-              spreadRadius: 3,
+              color: Colors.black.withOpacity(0.5),
+              spreadRadius: 2,
               blurRadius: 5,
-              offset: const Offset(0, 3),
+              offset: const Offset(0, -2),
             ),
           ],
         ),
@@ -222,41 +235,23 @@ class BottomNavigationBarWidget extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            IconButton(
-              icon: Icon(
-                Icons.home,
-                color:
-                    selectedIndex == 0 ? const Color(0xFF1ED760) : Colors.grey,
-              ),
-              onPressed: () => onItemTapped(0),
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.video_collection,
-                color:
-                    selectedIndex == 1 ? const Color(0xFF1ED760) : Colors.grey,
-              ),
-              onPressed: () => onItemTapped(1),
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.library_books,
-                color:
-                    selectedIndex == 2 ? const Color(0xFF1ED760) : Colors.grey,
-              ),
-              onPressed: () => onItemTapped(2),
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.person,
-                color:
-                    selectedIndex == 3 ? const Color(0xFF1ED760) : Colors.grey,
-              ),
-              onPressed: () => onItemTapped(3),
-            ),
+            _buildNavItem(Icons.home, 0, selectedIndex),
+            _buildNavItem(Icons.video_collection, 1, selectedIndex),
+            _buildNavItem(Icons.library_books, 2, selectedIndex),
+            _buildNavItem(Icons.person, 3, selectedIndex),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildNavItem(IconData icon, int index, int selectedIndex) {
+    return IconButton(
+      icon: Icon(
+        icon,
+        color: index == selectedIndex ? const Color(0xFF1ED760) : Colors.grey,
+      ),
+      onPressed: () => onItemTapped(index),
     );
   }
 }

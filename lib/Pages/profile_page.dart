@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:provider/provider.dart'; // Add this line
+import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -26,39 +26,31 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    currentUser = _auth.currentUser; // Get the current user
+    currentUser = _auth.currentUser;
   }
 
   Future<void> logout() async {
     try {
-      // Ensure the audio player stops and releases resources before logging out
       final audioProvider = Provider.of<AudioProvider>(context, listen: false);
       if (audioProvider.isPlaying) {
-        await audioProvider.audioPlayer.stop(); // Stop the audio
+        await audioProvider.audioPlayer.stop();
       }
 
       if (currentUser != null) {
         for (var provider in currentUser!.providerData) {
           if (provider.providerId == 'google.com') {
-            // Logout from Google
             final GoogleSignIn googleSignIn = GoogleSignIn();
             await googleSignIn.signOut();
-            print('Google user logged out');
           }
         }
       }
 
-      // Sign out from FirebaseAuth
       await _auth.signOut();
-      print('Firebase user logged out');
-
-      // Navigate to the onboarding screen
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Onboarding()),
       );
     } catch (e) {
-      print('Error during logout: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error during logout: $e'),
@@ -75,7 +67,6 @@ class _ProfilePageState extends State<ProfilePage> {
           .get();
       return doc['link'];
     } catch (e) {
-      print('Error fetching website link: $e');
       return null;
     }
   }
@@ -85,15 +76,15 @@ class _ProfilePageState extends State<ProfilePage> {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 2, 15, 27),
+      backgroundColor: const Color.fromARGB(255, 2, 15, 27),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             automaticallyImplyLeading: false,
             expandedHeight: size.height * 0.4,
-            collapsedHeight: size.height * 0.2 < kToolbarHeight
+            collapsedHeight: size.height * 0.1 < kToolbarHeight
                 ? kToolbarHeight
-                : size.height * 0.2,
+                : size.height * 0.1,
             floating: true,
             pinned: true,
             backgroundColor: const Color.fromARGB(255, 2, 15, 27),
@@ -108,10 +99,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 double profileTop = (maxExtent / 2 - profileSize / 2) *
                     collapseFactor.clamp(0.4, 1);
                 double profileLeft = collapseFactor == 1
-                    ? size.width / 2 - profileSize / 2
+                    ? size.width / 2 - profileSize / 3
                     : 16.0;
 
-                double titleOpacity = collapseFactor.clamp(1, 1);
+                double titleOpacity = collapseFactor.clamp(0, 1);
                 double titleLeft = collapseFactor == 1
                     ? size.width / 2 - profileSize / 2
                     : profileLeft + profileSize + 20;
@@ -120,31 +111,34 @@ class _ProfilePageState extends State<ProfilePage> {
                   fit: StackFit.expand,
                   children: [
                     Container(
-                      decoration:
-                          const BoxDecoration(color: Colors.transparent),
+                      decoration: const BoxDecoration(color: Colors.transparent),
                     ),
-                    // Profile Image
                     Positioned(
                       top: profileTop + (collapseFactor == 1 ? 0 : 50.0),
                       left: profileLeft,
                       child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeInOut,
                         width: profileSize,
                         height: profileSize,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 2.0),
-                          image: DecorationImage(
-                            image: NetworkImage(
-                              currentUser?.photoURL ??
-                                  'https://via.placeholder.com/150', // Fallback image
-                            ),
-                            fit: BoxFit.cover,
-                          ),
                         ),
+                        child: currentUser?.photoURL != null &&
+                                currentUser!.photoURL!.isNotEmpty
+                            ? ClipOval(
+                                child: Image.network(
+                                  currentUser!.photoURL!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return _fallbackAvatar();
+                                  },
+                                ),
+                              )
+                            : _fallbackAvatar(),
                       ),
                     ),
-                    // Title Text
                     Positioned(
                       top: profileTop + profileSize / 2 + 37,
                       left: titleLeft,
@@ -155,7 +149,9 @@ class _ProfilePageState extends State<ProfilePage> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              currentUser?.displayName ?? 'No Name',
+                              currentUser?.displayName?.isNotEmpty == true
+                                  ? currentUser!.displayName!
+                                  : "Hello!",
                               style: TextStyle(
                                 fontSize: size.width * 0.05,
                                 fontFamily: 'metropolis',
@@ -193,18 +189,38 @@ class _ProfilePageState extends State<ProfilePage> {
                       const SizedBox(height: 10),
                       Text(
                         currentUser?.email ?? 'No Email',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 18,
                           color: Colors.greenAccent,
                           fontFamily: 'metropolis',
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 15),
                       const Divider(height: 32),
-                      const SizedBox(height: 15),
                       ..._buildListItems(),
                       const Divider(height: 32),
+                      ListTile(
+                        title: const Text(
+                          'Report Bug',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.red,
+                            fontFamily: 'metropolis',
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        leading: const Icon(
+                          Icons.bug_report,
+                          color: Colors.red,
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => BugReportingPage()),
+                          );
+                        },
+                      ),
                       ListTile(
                         title: const Text(
                           'Logout',
@@ -220,7 +236,6 @@ class _ProfilePageState extends State<ProfilePage> {
                           color: Colors.red,
                         ),
                         onTap: () async {
-                          // Show confirmation dialog before logging out
                           bool? shouldLogout = await showDialog<bool>(
                             context: context,
                             builder: (BuildContext context) {
@@ -228,53 +243,39 @@ class _ProfilePageState extends State<ProfilePage> {
                                 backgroundColor: Colors.grey[900],
                                 title: const Text(
                                   'Confirm Logout',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: 'metropolis'),
+                                  style: TextStyle(color: Colors.white),
                                 ),
                                 content: const Text(
                                   'Are you sure you want to log out?',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: 'metropolis'),
+                                  style: TextStyle(color: Colors.white),
                                 ),
                                 actions: <Widget>[
                                   TextButton(
-                                    onPressed: () {
-                                      // Close the dialog and return false (user canceled)
-                                      Navigator.of(context).pop(false);
-                                    },
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(false),
                                     child: const Text(
                                       'Cancel',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontFamily: 'metropolis'),
+                                      style: TextStyle(color: Colors.white),
                                     ),
                                   ),
                                   TextButton(
-                                    onPressed: () {
-                                      // Close the dialog and return true (user confirmed)
-                                      Navigator.of(context).pop(true);
-                                    },
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(true),
                                     child: const Text(
                                       'Logout',
-                                      style: TextStyle(
-                                          color: Colors.red,
-                                          fontFamily: 'metropolis'),
+                                      style: TextStyle(color: Colors.red),
                                     ),
                                   ),
                                 ],
                               );
                             },
                           );
-
-                          // If user confirmed, call the logout function
                           if (shouldLogout == true) {
-                            await logout(); // Call your logout function
+                            await logout();
                           }
                         },
                       ),
-                      SizedBox(height: 130),
+                      const SizedBox(height: 130),
                     ],
                   ),
                 ),
@@ -286,65 +287,68 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Widget _fallbackAvatar() {
+    String initials = currentUser?.email?.substring(0, 1).toUpperCase() ?? "?";
+    return CircleAvatar(
+      backgroundColor: Colors.blueAccent,
+      child: Text(
+        initials,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 40,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
   List<Widget> _buildListItems() {
     return [
-      _buildListTile('Visit Website', Icons.web_asset, () async {
+      _buildListTile('Visit Website', Icons.web_asset, Colors.grey, () async {
         String? url = await _getWebsiteLink();
-        if (url != null) {
-          if (await canLaunch(url)) {
-            await launch(url);
-          } else {
-            throw 'Could not launch $url';
-          }
+        if (url != null && await canLaunch(url)) {
+          await launch(url);
         }
       }),
-      _buildListTile('About FM', Icons.info, () {
+      _buildListTile('About FM', Icons.info, Colors.grey, () {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => AboutPage()));
       }),
-      _buildListTile('Our Team', Icons.people, () {
+      _buildListTile('Our Team', Icons.people, Colors.grey, () {
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => TeamMembersPage()));
       }),
-      _buildListTile('About Developer', Icons.developer_mode_outlined, () {
+      _buildListTile(
+          'About Developer', Icons.developer_mode_outlined, Colors.grey, () {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => AboutDeveloperPage()),
         );
       }),
-      _buildListTile('Share App', Icons.share, () {
-        // Create an instance of ShareAppButton and show it in a dialog or navigate to a new screen, for example:
+      _buildListTile('Share App', Icons.share, Colors.grey, () {
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
               backgroundColor: Colors.grey.shade900,
-              title: Text(
+              title: const Text(
                 'Share App',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'metropolis',
-                    fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.white),
               ),
               actions: <Widget>[
                 Row(
-                  mainAxisAlignment: MainAxisAlignment
-                      .center, // Align items at the end of the row
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       'Tap Here...',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'metropolis',
-                          fontWeight: FontWeight.bold),
+                      style: TextStyle(color: Colors.white),
                     ),
                     IconButton(
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.share,
                         color: Colors.greenAccent,
-                      ), // Your icon here
+                      ),
                       onPressed: () {
-                        // Handle icon button press
                         ShareAppButton().shareApp();
                       },
                     ),
@@ -355,25 +359,22 @@ class _ProfilePageState extends State<ProfilePage> {
           },
         );
       }),
-      _buildListTile('Report Bug', Icons.bug_report, () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => BugReportingPage()));
-      }),
     ];
   }
 
-  Widget _buildListTile(String title, IconData icon, VoidCallback onTap) {
+  Widget _buildListTile(
+      String title, IconData icon, Color iconColor, VoidCallback onTap) {
     return ListTile(
       title: Text(
         title,
         style: const TextStyle(
-          fontSize: 18,
+          fontSize: 16,
           color: Colors.white,
           fontFamily: 'metropolis',
           fontWeight: FontWeight.bold,
         ),
       ),
-      leading: Icon(icon, color: Colors.white),
+      leading: Icon(icon, color: iconColor),
       onTap: onTap,
     );
   }

@@ -4,16 +4,37 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:arasu_fm/Pages/audio_data.dart';
 import 'package:arasu_fm/Providers/audio_provider.dart';
-import 'package:lottie/lottie.dart';
 
-class AudioPlayerPage extends StatelessWidget {
+class AudioPlayerPage extends StatefulWidget {
   final AudioData audioData;
 
   const AudioPlayerPage({
     required this.audioData,
-    Key? key,
-    required String audioUrl,
+    Key? key, required String audioUrl,
   }) : super(key: key);
+
+  @override
+  _AudioPlayerPageState createState() => _AudioPlayerPageState();
+}
+
+class _AudioPlayerPageState extends State<AudioPlayerPage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(seconds: 5),
+      vsync: this,
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   String formatDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
@@ -22,6 +43,60 @@ class AudioPlayerPage extends StatelessWidget {
     final seconds = twoDigits(duration.inSeconds.remainder(60));
     return [if (duration.inHours > 0) hours, minutes, seconds].join(':');
   }
+Widget _buildNeonRunningBorderImage(
+    AudioProvider audioProvider, double screenHeight, double screenWidth) {
+  return AnimatedBuilder(
+    animation: _animationController,
+    builder: (context, child) {
+      return Hero(
+        tag: 'albumArt_${audioProvider.currentAudio?? "default"}', // Same tag as in the overlay
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(20),
+            gradient: SweepGradient(
+              colors: const [
+                Colors.black45,
+                Colors.grey,
+                Colors.black38,
+                Colors.grey,
+                Colors.black38,
+                Colors.grey,
+                Colors.black38,
+              ],
+              transform:
+                  GradientRotation(_animationController.value * 2 * 3.1416),
+            ),
+            boxShadow: audioProvider.isPlaying
+                ? [
+                    BoxShadow(
+                      color: Colors.blue.withOpacity(0.5),
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 0),
+                    ),
+                  ]
+                : [],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(4), // Space for neon glow
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Image.network(
+                audioProvider.currentAudio?.imageUrl ??
+                    widget.audioData.imageUrl,
+                height: screenHeight * 0.35,
+                width: screenWidth * 0.7,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +112,7 @@ class AudioPlayerPage extends StatelessWidget {
           gradient: LinearGradient(
             colors: [
               Color.fromARGB(255, 60, 58, 58),
-              const Color.fromARGB(255, 2, 15, 27),
+              Color.fromARGB(255, 2, 15, 27),
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -52,26 +127,13 @@ class AudioPlayerPage extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Card(
-                        elevation: 10,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.network(
-                            audioProvider.currentAudio?.imageUrl ?? audioData.imageUrl,
-                            height: screenHeight * 0.35,
-                            width: screenWidth * 0.7,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
+                      _buildNeonRunningBorderImage(audioProvider, screenHeight, screenWidth),
                       const SizedBox(height: 16),
                       Text(
-                        audioProvider.currentAudio?.title ?? audioData.title,
+                        audioProvider.currentAudio?.title ?? widget.audioData.title,
                         style: TextStyle(
                           color: Colors.white,
+                          fontFamily: "metropolis",
                           fontSize: screenWidth * 0.05,
                         ),
                       ),
@@ -81,11 +143,11 @@ class AudioPlayerPage extends StatelessWidget {
                         children: [
                           IconButton(
                             icon: Icon(
-                              audioProvider.isLiked(audioData)
+                              audioProvider.isLiked(widget.audioData)
                                   ? Icons.my_library_books
                                   : Icons.library_add,
                               size: 30,
-                              color: audioProvider.isLiked(audioData)
+                              color: audioProvider.isLiked(widget.audioData)
                                   ? const Color.fromARGB(255, 36, 183, 196)
                                   : Colors.white,
                             ),
@@ -93,7 +155,7 @@ class AudioPlayerPage extends StatelessWidget {
                             iconSize: 40,
                           ),
                           SizedBox(width: screenWidth * 0.2),
-                           ShareAppButton(),
+                          ShareAppButton(),
                         ],
                       ),
                       const SizedBox(height: 10),
@@ -120,7 +182,7 @@ class AudioPlayerPage extends StatelessWidget {
         final clampedValue = position.inMilliseconds
             .clamp(0, duration.inMilliseconds)
             .toDouble();
-        
+
         return Column(
           children: [
             Slider(
@@ -186,7 +248,8 @@ class AudioPlayerPage extends StatelessWidget {
           onPressed: audioProvider.playPrevious,
           color: Colors.white,
           iconSize: 40,
-        ),AudioControlButton(audioProvider: audioProvider,),
+        ),
+        AudioControlButton(audioProvider: audioProvider),
         IconButton(
           icon: const Icon(Icons.skip_next),
           onPressed: audioProvider.playNext,

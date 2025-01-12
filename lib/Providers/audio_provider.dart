@@ -97,73 +97,74 @@ class AudioProvider with ChangeNotifier {
       debugPrint('Stack Trace: $stackTrace');
     }
   }
-Future<void> playNext() async {
-  try {
-    // Set loading state to true when switching tracks
-    _isLoading = true;
-    notifyListeners();
 
-    if (_audioList.isEmpty) {
-      debugPrint('Audio list is empty, cannot play next');
-      return;
+  Future<void> playNext() async {
+    try {
+      // Set loading state to true when switching tracks
+      _isLoading = true;
+      notifyListeners();
+
+      if (_audioList.isEmpty) {
+        debugPrint('Audio list is empty, cannot play next');
+        return;
+      }
+
+      final currentIndex = _audioList.indexOf(_currentAudio!);
+
+      if (currentIndex < 0) {
+        debugPrint('Current audio not found in the list');
+        return;
+      }
+
+      final nextIndex = _isShuffling
+          ? Random().nextInt(_audioList.length)
+          : (currentIndex + 1) % _audioList.length;
+
+      if (nextIndex >= 0 && nextIndex < _audioList.length) {
+        _currentAudio = _audioList[nextIndex];
+        await playAudio(_currentAudio!);
+      } else {
+        debugPrint('Invalid next track index');
+      }
+    } catch (e, stackTrace) {
+      debugPrint('Error in playNext: $e');
+      debugPrint('Stack Trace: $stackTrace');
     }
-
-    final currentIndex = _audioList.indexOf(_currentAudio!);
-
-    if (currentIndex < 0) {
-      debugPrint('Current audio not found in the list');
-      return;
-    }
-
-    final nextIndex = _isShuffling
-        ? Random().nextInt(_audioList.length)
-        : (currentIndex + 1) % _audioList.length;
-
-    if (nextIndex >= 0 && nextIndex < _audioList.length) {
-      _currentAudio = _audioList[nextIndex];
-      await playAudio(_currentAudio!);
-    } else {
-      debugPrint('Invalid next track index');
-    }
-  } catch (e, stackTrace) {
-    debugPrint('Error in playNext: $e');
-    debugPrint('Stack Trace: $stackTrace');
   }
-}
 
-Future<void> playPrevious() async {
-  try {
-    // Set loading state to true when switching tracks
-    _isLoading = true;
-    notifyListeners();
+  Future<void> playPrevious() async {
+    try {
+      // Set loading state to true when switching tracks
+      _isLoading = true;
+      notifyListeners();
 
-    if (_audioList.isEmpty) {
-      debugPrint('Audio list is empty, cannot play previous');
-      return;
+      if (_audioList.isEmpty) {
+        debugPrint('Audio list is empty, cannot play previous');
+        return;
+      }
+
+      final currentIndex = _audioList.indexOf(_currentAudio!);
+
+      if (currentIndex < 0) {
+        debugPrint('Current audio not found in the list');
+        return;
+      }
+
+      final prevIndex = _isShuffling
+          ? Random().nextInt(_audioList.length)
+          : (currentIndex - 1 + _audioList.length) % _audioList.length;
+
+      if (prevIndex >= 0 && prevIndex < _audioList.length) {
+        _currentAudio = _audioList[prevIndex];
+        await playAudio(_currentAudio!);
+      } else {
+        debugPrint('Invalid previous track index');
+      }
+    } catch (e, stackTrace) {
+      debugPrint('Error in playPrevious: $e');
+      debugPrint('Stack Trace: $stackTrace');
     }
-
-    final currentIndex = _audioList.indexOf(_currentAudio!);
-
-    if (currentIndex < 0) {
-      debugPrint('Current audio not found in the list');
-      return;
-    }
-
-    final prevIndex = _isShuffling
-        ? Random().nextInt(_audioList.length)
-        : (currentIndex - 1 + _audioList.length) % _audioList.length;
-
-    if (prevIndex >= 0 && prevIndex < _audioList.length) {
-      _currentAudio = _audioList[prevIndex];
-      await playAudio(_currentAudio!);
-    } else {
-      debugPrint('Invalid previous track index');
-    }
-  } catch (e, stackTrace) {
-    debugPrint('Error in playPrevious: $e');
-    debugPrint('Stack Trace: $stackTrace');
   }
-}
 
   bool isLiked(AudioData audio) {
     return _likedAudios.contains(audio.audioUrl);
@@ -210,6 +211,9 @@ Future<void> playPrevious() async {
     notifyListeners();
   }
 
+  // Getter for _audioList
+  List<AudioData> get audioList => _audioList;
+
   void toggleReplay() {
     _isReplaying = !_isReplaying;
     notifyListeners();
@@ -219,6 +223,7 @@ Future<void> playPrevious() async {
     _isShuffling = !_isShuffling;
     notifyListeners();
   }
+
   void togglePlayPause() {
     try {
       if (_isLoading || !_isAudioReady) return;

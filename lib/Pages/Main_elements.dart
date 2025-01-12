@@ -32,6 +32,7 @@ class _HomePageContentState extends State<HomePageContent> {
 
   Future<void> _simulateLoading() async {
     await Future.delayed(const Duration(seconds: 3)); // Show shimmer for 2 seconds
+    
     await Future.wait([_fetchAudioData(), loadSliderImages()]); // Load data
     setState(() {
       _isLoading = false; // Stop shimmer after data is loaded
@@ -152,40 +153,56 @@ class _HomePageContentState extends State<HomePageContent> {
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 2, 15, 27),
-      appBar: AppBar(toolbarHeight: 70,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
-              'Arasu FM 90.4 MHz',
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: 'metropolis',
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            Text(
-              'சமூக பொறுப்பும்!  சமூக  நலனும்....',
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 12,
-                fontFamily: 'metropolis',
-              ),
-            ),
-          ],
+      appBar: AppBar(
+  toolbarHeight: 70,
+  title: Row(
+    children: [
+      // Add the logo before the title
+      Padding(
+        padding: const EdgeInsets.all(1.0),
+        child: Image.asset(
+          'assets/arasulogo.png', // Replace with your logo asset path
+          height: 60,       // Adjust the height of the logo
+          fit: BoxFit.contain,
         ),
-        backgroundColor: const Color(0xff213555),
-        actions: audioProvider.isPlaying
-            ? [
-                GestureDetector(
-                  key: animationKey, // Add this line
-                  onTap: () => _showTutorialPopup(animationKey), // Modify this line
-                  child: Lottie.asset("assets/tab.json"),
-                ),
-                SizedBox(width: 10),
-              ]
-            : [],
       ),
+      const SizedBox(width: 4), // Add spacing between logo and text
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text(
+            'Arasu FM 90.4 MHz',
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: 'metropolis',
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          Text(
+            'சமூக பொறுப்பும்!  சமூக  நலனும்....',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 12,
+              fontFamily: 'metropolis',
+            ),
+          ),
+        ],
+      ),
+    ],
+  ),
+  backgroundColor: const Color(0xff213555),
+  actions: audioProvider.isPlaying
+      ? [
+          GestureDetector(
+            key: animationKey,
+            onTap: () => _showTutorialPopup(animationKey),
+            child: Lottie.asset("assets/tab.json"),
+          ),
+          const SizedBox(width: 10),
+        ]
+      : [],
+),
+
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -371,62 +388,141 @@ class _HomePageContentState extends State<HomePageContent> {
                       }),
                     ),
                   )
-                : ListView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount:
-                        _audioList.length > 6 ? _audioList.length - 6 : 0,
-                    itemBuilder: (context, index) {
-                      final audio = _audioList[index + 6];
-                      return Card(
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 8.0, horizontal: 10.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        color: const Color.fromARGB(255, 30, 43, 65),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(10.0),
-                          leading: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.network(
-                              audio.imageUrl,
-                              width: 60,
-                              height: 60,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          title: Text(
-                            audio.title,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontFamily: 'metropolis',
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(
-                              Icons.play_arrow,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {
-                              audioProvider.playAudio(audio);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => AudioPlayerPage(
-                                    audioUrl: audio.audioUrl,
-                                    audioData: audio,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      );
-                    },
+                : Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    // ListView for the first 5 audios
+    ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: _audioList.length > 6
+          ? (_audioList.length - 6).clamp(0, 5)
+          : 0,
+      itemBuilder: (context, index) {
+        final audio = _audioList[index + 6];
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          color: const Color.fromARGB(255, 30, 43, 65),
+          child: ListTile(
+            contentPadding: const EdgeInsets.all(10.0),
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.network(
+                audio.imageUrl,
+                width: 60,
+                height: 60,
+                fit: BoxFit.cover,
+              ),
+            ),
+            title: Text(
+              audio.title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontFamily: 'metropolis',
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            trailing: IconButton(
+              icon: const Icon(
+                Icons.play_arrow,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                audioProvider.playAudio(audio);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AudioPlayerPage(
+                      audioUrl: audio.audioUrl,
+                      audioData: audio,
+                    ),
                   ),
-            const SizedBox(height: 20),
+                );
+              },
+            ),
+          ),
+        );
+      },
+    ),
+
+    // GridView for the remaining audios
+    if (_audioList.length > 11)
+      Padding(
+        padding: const EdgeInsets.only(top: 6.0,left: 6,right: 6,bottom: 6),
+        child: GridView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          itemCount: _audioList.length - 11, // Remaining audios
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2, // Number of cards per row
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 3, // Adjust for card height/width ratio
+          ),
+          itemBuilder: (context, index) {
+            final audio = _audioList[index + 11];
+            return GestureDetector(
+              onTap: () {
+                audioProvider.playAudio(audio);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AudioPlayerPage(
+                      audioUrl: audio.audioUrl,
+                      audioData: audio,
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.primaries[index % Colors.primaries.length]
+                      .withOpacity(0.8), // Dynamic background color
+                ),
+                child: Stack(
+                  children: [
+                    if (audio.imageUrl.isNotEmpty)
+                      Positioned(
+                        top: 4,
+                        right: 10,
+                        bottom: 4,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.network(
+                            audio.imageUrl,
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Text(
+                        audio.title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+  ],
+),
+
+
+            const SizedBox(height: 100),
           ],
         ),
       ),
