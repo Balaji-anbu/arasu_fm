@@ -70,7 +70,7 @@ Widget _buildNeonRunningBorderImage(
             boxShadow: audioProvider.isPlaying
                 ? [
                     BoxShadow(
-                      color: Colors.blue.withOpacity(0.5),
+                      color: Colors.grey.withOpacity(0.1),
                       blurRadius: 10,
                       spreadRadius: 2,
                       offset: const Offset(0, 0),

@@ -153,7 +153,7 @@ class _HomePageContentState extends State<HomePageContent> {
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 2, 15, 27),
-      appBar: AppBar(
+      appBar: AppBar(automaticallyImplyLeading: true,
   toolbarHeight: 70,
   title: Row(
     children: [
@@ -161,8 +161,8 @@ class _HomePageContentState extends State<HomePageContent> {
       Padding(
         padding: const EdgeInsets.all(1.0),
         child: Image.asset(
-          'assets/arasulogo.png', // Replace with your logo asset path
-          height: 60,       // Adjust the height of the logo
+          'assets/main.png', 
+          height: 50,   // Adjust the height of the logo
           fit: BoxFit.contain,
         ),
       ),
@@ -520,9 +520,19 @@ class _HomePageContentState extends State<HomePageContent> {
       ),
   ],
 ),
+ SizedBox(height: 50),
+Text("Ohh! You Reached End",style: TextStyle(color: Colors.white,fontFamily: "metropolis",fontSize: 16),),
+Text("Go To Video Section To Explore More!",style: TextStyle(color: Colors.white,fontFamily: "metropolis",fontSize: 16),),
 
-
-            const SizedBox(height: 100),
+Column(mainAxisAlignment: MainAxisAlignment.start,
+  children: [
+    Padding(
+      padding: const EdgeInsets.only(right: 100),
+      child: Lottie.asset("assets/end.json"),
+    ),
+  ],
+),
+            SizedBox(height: 110),
           ],
         ),
       ),

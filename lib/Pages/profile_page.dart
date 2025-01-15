@@ -12,6 +12,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 
+import 'package:webview_flutter/webview_flutter.dart';
+
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
@@ -71,221 +73,169 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+ @override
+Widget build(BuildContext context) {
+  final size = MediaQuery.of(context).size;
 
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 2, 15, 27),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            automaticallyImplyLeading: false,
-            expandedHeight: size.height * 0.4,
-            collapsedHeight: size.height * 0.1 < kToolbarHeight
-                ? kToolbarHeight
-                : size.height * 0.1,
-            floating: true,
-            pinned: true,
-            backgroundColor: const Color.fromARGB(255, 2, 15, 27),
-            flexibleSpace: LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
-                double maxExtent = constraints.maxHeight;
-                double minExtent = kToolbarHeight;
-                double collapseFactor =
-                    (maxExtent - minExtent) / (size.height * 0.4 - minExtent);
-
-                double profileSize = 150 * collapseFactor.clamp(0, 1);
-                double profileTop = (maxExtent / 2 - profileSize / 2) *
-                    collapseFactor.clamp(0.4, 1);
-                double profileLeft = collapseFactor == 1
-                    ? size.width / 2 - profileSize / 3
-                    : 16.0;
-
-                double titleOpacity = collapseFactor.clamp(0, 1);
-                double titleLeft = collapseFactor == 1
-                    ? size.width / 2 - profileSize / 2
-                    : profileLeft + profileSize + 20;
-
-                return Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Container(
-                      decoration: const BoxDecoration(color: Colors.transparent),
-                    ),
-                    Positioned(
-                      top: profileTop + (collapseFactor == 1 ? 0 : 50.0),
-                      left: profileLeft,
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        curve: Curves.easeInOut,
-                        width: profileSize,
-                        height: profileSize,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2.0),
+  return Scaffold(
+    backgroundColor: const Color.fromARGB(255, 2, 15, 27),
+    body: Column(
+      children: [
+        // Toolbar with custom height and profile image
+        Container(
+          height: 200,
+          color: const Color.fromARGB(255, 2, 15, 27),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2.0),
+                ),
+                child: currentUser?.photoURL != null &&
+                        currentUser!.photoURL!.isNotEmpty
+                    ? ClipOval(
+                        child: Image.network(
+                          currentUser!.photoURL!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return _fallbackAvatar();
+                          },
                         ),
-                        child: currentUser?.photoURL != null &&
-                                currentUser!.photoURL!.isNotEmpty
-                            ? ClipOval(
-                                child: Image.network(
-                                  currentUser!.photoURL!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return _fallbackAvatar();
-                                  },
-                                ),
-                              )
-                            : _fallbackAvatar(),
-                      ),
-                    ),
-                    Positioned(
-                      top: profileTop + profileSize / 2 + 37,
-                      left: titleLeft,
-                      child: AnimatedOpacity(
-                        duration: const Duration(milliseconds: 300),
-                        opacity: titleOpacity,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              currentUser?.displayName?.isNotEmpty == true
-                                  ? currentUser!.displayName!
-                                  : "Hello!",
+                      )
+                    : _fallbackAvatar(),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: CustomScrollView(
+            slivers: [
+              SliverList(
+                delegate: SliverChildListDelegate(
+                  [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 20),
+                          const Text(
+                            'Signed in with',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontFamily: 'metropolis',
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            currentUser?.email ?? 'No Email',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.greenAccent,
+                              fontFamily: 'metropolis',
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const Divider(height: 32),
+                          ..._buildListItems(),
+                          const Divider(height: 32),
+                          ListTile(
+                            title: const Text(
+                              'Report Bug',
                               style: TextStyle(
-                                fontSize: size.width * 0.05,
+                                fontSize: 18,
+                                color: Colors.red,
                                 fontFamily: 'metropolis',
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
                               ),
                             ),
-                          ],
-                        ),
+                            leading: const Icon(
+                              Icons.bug_report,
+                              color: Colors.red,
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => BugReportingPage()),
+                              );
+                            },
+                          ),
+                          ListTile(
+                            title: const Text(
+                              'Logout',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.red,
+                                fontFamily: 'metropolis',
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            leading: const Icon(
+                              Icons.exit_to_app,
+                              color: Colors.red,
+                            ),
+                            onTap: () async {
+                              bool? shouldLogout = await showDialog<bool>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: Colors.grey[900],
+                                    title: const Text(
+                                      'Confirm Logout',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    content: const Text(
+                                      'Are you sure you want to log out?',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(false),
+                                        child: const Text(
+                                          'Cancel',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(true),
+                                        child: const Text(
+                                          'Logout',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                              if (shouldLogout == true) {
+                                await logout();
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 30),
+                        ],
                       ),
                     ),
                   ],
-                );
-              },
-            ),
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate(
-              [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Signed in with',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontFamily: 'metropolis',
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        currentUser?.email ?? 'No Email',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.greenAccent,
-                          fontFamily: 'metropolis',
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const Divider(height: 32),
-                      ..._buildListItems(),
-                      const Divider(height: 32),
-                      ListTile(
-                        title: const Text(
-                          'Report Bug',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.red,
-                            fontFamily: 'metropolis',
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        leading: const Icon(
-                          Icons.bug_report,
-                          color: Colors.red,
-                        ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => BugReportingPage()),
-                          );
-                        },
-                      ),
-                      ListTile(
-                        title: const Text(
-                          'Logout',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.red,
-                            fontFamily: 'metropolis',
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        leading: const Icon(
-                          Icons.exit_to_app,
-                          color: Colors.red,
-                        ),
-                        onTap: () async {
-                          bool? shouldLogout = await showDialog<bool>(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                backgroundColor: Colors.grey[900],
-                                title: const Text(
-                                  'Confirm Logout',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                content: const Text(
-                                  'Are you sure you want to log out?',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(false),
-                                    child: const Text(
-                                      'Cancel',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(true),
-                                    child: const Text(
-                                      'Logout',
-                                      style: TextStyle(color: Colors.red),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                          if (shouldLogout == true) {
-                            await logout();
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 130),
-                    ],
-                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
 
   Widget _fallbackAvatar() {
     String initials = currentUser?.email?.substring(0, 1).toUpperCase() ?? "?";
@@ -305,11 +255,17 @@ class _ProfilePageState extends State<ProfilePage> {
   List<Widget> _buildListItems() {
     return [
       _buildListTile('Visit Website', Icons.web_asset, Colors.grey, () async {
-        String? url = await _getWebsiteLink();
-        if (url != null && await canLaunch(url)) {
-          await launch(url);
-        }
-      }),
+  String? url = await _getWebsiteLink();
+  if (url != null) {
+    // Open the URL in WebView
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => WebViewScreen(url: url),
+      ),
+    );
+  }
+}),
       _buildListTile('About FM', Icons.info, Colors.grey, () {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => AboutPage()));
@@ -376,6 +332,39 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       leading: Icon(icon, color: iconColor),
       onTap: onTap,
+    );
+  }
+}
+
+class WebViewScreen extends StatefulWidget {
+  final String url;
+  WebViewScreen({required this.url});
+
+  @override
+  _WebViewScreenState createState() => _WebViewScreenState();
+}
+
+class _WebViewScreenState extends State<WebViewScreen> {
+  late WebViewController _webViewController;
+
+  @override
+  void initState() {
+    super.initState();
+    WebViewPlatform.instance;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Website'),
+      ),
+      body: WebView(
+        initialUrl: widget.url,
+        onWebViewCreated: (WebViewController webViewController) {
+          _webViewController = webViewController;
+        },
+      ),
     );
   }
 }
