@@ -141,24 +141,60 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
 
   // Delete slider image entry
   Future<void> deleteSliderImageEntry(DocumentSnapshot document) async {
-    try {
-      final imageId = document['imageId'];
+    // Show a confirmation dialog
+    bool? deleteConfirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Confirm Delete'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Are you sure you want to delete this image?'),
+              SizedBox(height: 10),
+              Image.network(
+                document['imageUrl'],
+                width: 100,
+                height: 100,
+                fit: BoxFit.cover,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
 
-      // Delete file from Google Drive
-      await deleteFileFromGoogleDrive(imageId);
+    // If confirmed, delete the image from Google Drive and Firestore
+    if (deleteConfirmed == true) {
+      try {
+        final imageId = document['imageId'];
 
-      // Delete Firestore document
-      await document.reference.delete();
+        // Delete file from Google Drive
+        await deleteFileFromGoogleDrive(imageId);
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Slider image deleted successfully!'),
-        backgroundColor: Colors.orange,
-      ));
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error deleting slider image: $e'),
-        backgroundColor: Colors.red,
-      ));
+        // Delete Firestore document
+        await document.reference.delete();
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Slider image deleted successfully!'),
+          backgroundColor: Colors.orange,
+        ));
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error deleting slider image: $e'),
+          backgroundColor: Colors.red,
+        ));
+      }
     }
   }
 
@@ -198,6 +234,7 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
               ),
               child: ListTile(
                 contentPadding: const EdgeInsets.all(16),
+               
                 title: Text(
                   document['title'],
                   style: TextStyle(
@@ -206,16 +243,28 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
                     color: Colors.teal,
                   ),
                 ),
-                subtitle: Row(
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.image, size: 20, color: Colors.blueGrey),
-                    SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        document['imageUrl'],
-                        style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    Row(
+                      children: [
+                        Icon(Icons.image, size: 20, color: Colors.blueGrey),
+                        SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            document['imageUrl'],
+                            style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    Image.network(
+                      document['imageUrl'],
+                      width: 280,
+                      height: 180,
+                      fit: BoxFit.cover,
                     ),
                   ],
                 ),
@@ -246,11 +295,56 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Upload Slider Images',
-            style: TextStyle(fontFamily: 'metropolis')),
-        backgroundColor: Colors.teal,
-      ),
+      appBar:AppBar(
+          title: Text(
+            'Upload Sliders',
+            style: TextStyle(
+              fontFamily: 'metropolis',
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          backgroundColor: Colors.teal,
+          actions: [
+           Padding(
+  padding: const EdgeInsets.all(8.0),
+  child: IconButton(
+    icon: Icon(Icons.info, size: 30, color: Colors.black),
+    onPressed: () {
+      // Show the bottom sheet when the icon is tapped
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,  // Allow bottom sheet to grow in height
+        builder: (BuildContext context) {
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'Important Notes:',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text('Note 1: Images must be in size range of 200kb to 1MB'),
+                Text('Note 2: Image must be an aspect ratio of 16:9'),
+                Text('Note 3: Wait until the upload process complete.'),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  ),
+)
+
+          ],
+        ),
       body: Stack(
         children: [
           Column(
@@ -271,25 +365,48 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
                   },
                 ),
               ),
-              ElevatedButton.icon(
-                onPressed: _pickSliderImageFile,
-                icon: Icon(Icons.image),
-                label: Text('Pick Image',
-                    style: TextStyle(fontFamily: 'metropolis')),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal,
+              InkWell(
+                onTap: _pickSliderImageFile,
+                borderRadius: BorderRadius.circular(12),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    color: Colors.teal,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.image, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text('Pick Image', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
                 ),
               ),
               SizedBox(height: 20),
+              if (_sliderImageFile != null)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.file(
+                    _sliderImageFile!,
+                    width: 300,
+                    height: 200,
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ElevatedButton(
                 onPressed: _uploadSliderImage,
                 child: Text(
                   'Upload',
-                  style: TextStyle(fontFamily: 'metropolis'),
+                  style: TextStyle(fontFamily: 'metropolis' ,color: Colors.white,fontWeight: FontWeight.bold,fontSize: 16),
                 ),
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   backgroundColor: Colors.teal,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
               Expanded(

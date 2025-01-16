@@ -2,6 +2,7 @@
 
 import 'package:arasu_fm/AdminPages/admin_sliderupload.dart';
 import 'package:arasu_fm/AdminPages/admin_upload.dart';
+import 'package:arasu_fm/AdminPages/featured_podcast_upload.dart';
 import 'package:arasu_fm/Pages/onboarding.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -19,34 +20,23 @@ class AdminHome extends StatelessWidget {
     currentUser = _auth.currentUser; // Get the current user
   }
 
-  Future<void> logout(BuildContext context) async {
-    try {
-      if (currentUser != null) {
-        for (var provider in currentUser!.providerData) {
-          if (provider.providerId == 'google.com') {
-            // Logout from Google
-            final GoogleSignIn googleSignIn = GoogleSignIn();
-            await googleSignIn.signOut();
-            print('Google user logged out');
-          }
-        }
-      }
-
-      // Sign out from FirebaseAuth
-      await _auth.signOut();
-      print('Firebase user logged out');
-
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Onboarding()));
-    } catch (e) {
-      print('Error during logout: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error during logout: $e'),
-        ),
-      );
-    }
+// Logout Function
+Future<void> signOut(BuildContext context) async {
+  try {
+    await FirebaseAuth.instance.signOut();
+    await GoogleSignIn().signOut();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const Onboarding()),
+      (route) => false,
+    );
+  } catch (e) {
+    print('Error signing out: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed to sign out. Please try again.')),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +80,7 @@ class AdminHome extends StatelessWidget {
               // Proceed with logout if confirmed
               if (shouldLogout ?? false) {
                 print("User logged out");
-                await logout(context); // Call the logout method with context
+                await signOut(context); // Call the logout method with context
               }
             },
             icon: const Icon(Icons.exit_to_app),
@@ -101,7 +91,7 @@ class AdminHome extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
               'Welcome to the Admin Panel',
@@ -113,7 +103,14 @@ class AdminHome extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 10),
+            Text("Upload Main Stream Podcasts",style: TextStyle(
+                fontSize: 22,
+                fontFamily: 'metropolis',
+                fontWeight: FontWeight.bold,
+                color: Colors.deepOrange,
+              ),),
+            const SizedBox(height: 5),
             InkWell(
               onTap: () {
                 Navigator.push(
@@ -132,7 +129,43 @@ class AdminHome extends StatelessWidget {
                 child: Text(
                   'Upload Podcasts',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
+                    fontFamily: 'metropolis',
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+             const SizedBox(height: 24),
+            Divider(thickness: 1,),
+             const SizedBox(height: 24),
+            Text("Upload Featured Podcasts and Theme Audios ",style: TextStyle(
+                fontSize: 22,
+                fontFamily: 'metropolis',
+                fontWeight: FontWeight.bold,
+                color: Colors.deepOrange,
+              ),),
+            const SizedBox(height: 5),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PodcastAdminPage()),
+                );
+              },
+              borderRadius: BorderRadius.circular(8),
+              child: Ink(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                decoration: BoxDecoration(
+                  color: Colors.teal,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'Featured Tab',
+                  style: TextStyle(
+                    fontSize: 18,
                     fontFamily: 'metropolis',
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -141,6 +174,15 @@ class AdminHome extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
+            Divider(thickness: 1,),
+             const SizedBox(height: 24),
+            Text("Upload sliders or New updates and posters ",style: TextStyle(
+                fontSize: 22,
+                fontFamily: 'metropolis',
+                fontWeight: FontWeight.bold,
+                color: Colors.deepOrange,
+              ),),
+            const SizedBox(height: 5),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -160,6 +202,9 @@ class AdminHome extends StatelessWidget {
               child: const Text('Upload Sliders',
                   style: TextStyle(
                     fontFamily: 'metropolis',
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black54,
+                    fontSize: 18
                   )),
             ),
           ],

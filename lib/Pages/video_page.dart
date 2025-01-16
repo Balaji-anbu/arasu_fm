@@ -58,18 +58,35 @@ class _VideoPageState extends State<VideoPage> {
             fontFamily: 'metropolis',
             fontWeight: FontWeight.bold,
           ),
-        ),
-        actions: [
-          TextButton.icon(
-            onPressed: () {
-              final channelId = context.read<VideoProvider>().channelId;
-              final url = 'https://www.youtube.com/channel/$channelId';
-              launchUrl(Uri.parse(url));
-            },
-            icon: const Icon(Icons.subscriptions, color: Colors.red),
-            label: const Text('Subscribe', style: TextStyle(color: Colors.white)),
+        ),actions: [
+  TextButton(
+    onPressed: () {
+      final channelId = context.read<VideoProvider>().channelId;
+      final url = 'https://www.youtube.com/channel/$channelId';
+      launchUrl(Uri.parse(url));
+    },
+    style: TextButton.styleFrom(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+    ),
+    child: Row(
+      children: [
+        SizedBox(
+          height: 40, // Adjust the size to fit your design
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Lottie.asset("assets/subscribe.json"),
           ),
-        ],
+        ),
+        const SizedBox(width: 2), // Add spacing between animation and text
+        const Text(
+          'Subscribe',
+          style: TextStyle(color: Colors.white,fontFamily: "metropolis",fontSize: 18,fontWeight: FontWeight.bold),
+        ),
+      ],
+    ),
+  ),
+],
+
       ),
       body: Consumer<VideoProvider>(
         builder: (context, videoProvider, child) {
@@ -173,7 +190,8 @@ class _VideoPageState extends State<VideoPage> {
               child: Text(
                 video['title'],
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: Colors.white, 
+                  fontFamily: "metropolis",
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                   overflow: TextOverflow.ellipsis,

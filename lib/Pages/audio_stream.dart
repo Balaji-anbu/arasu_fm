@@ -1,5 +1,6 @@
 import 'package:arasu_fm/controllers/audio_control_button.dart';
 import 'package:arasu_fm/model/share_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:arasu_fm/Pages/audio_data.dart';
@@ -45,56 +46,24 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
   }
 Widget _buildNeonRunningBorderImage(
     AudioProvider audioProvider, double screenHeight, double screenWidth) {
-  return AnimatedBuilder(
-    animation: _animationController,
-    builder: (context, child) {
-      return Hero(
-        tag: 'albumArt_${audioProvider.currentAudio?? "default"}', // Same tag as in the overlay
-        child: Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.rectangle,
-            borderRadius: BorderRadius.circular(20),
-            gradient: SweepGradient(
-              colors: const [
-                Colors.black45,
-                Colors.grey,
-                Colors.black38,
-                Colors.grey,
-                Colors.black38,
-                Colors.grey,
-                Colors.black38,
-              ],
-              transform:
-                  GradientRotation(_animationController.value * 2 * 3.1416),
-            ),
-            boxShadow: audioProvider.isPlaying
-                ? [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      blurRadius: 10,
-                      spreadRadius: 2,
-                      offset: const Offset(0, 0),
-                    ),
-                  ]
-                : [],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(4), // Space for neon glow
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.network(
-                audioProvider.currentAudio?.imageUrl ??
-                    widget.audioData.imageUrl,
-                height: screenHeight * 0.35,
-                width: screenWidth * 0.7,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-        ),
-      );
-    },
-  );
+  return Padding(
+            padding: const EdgeInsets.all(0), // Space for neon glow
+            child:
+ClipRRect(
+  borderRadius: BorderRadius.circular(20),
+  child: CachedNetworkImage(
+    imageUrl: audioProvider.currentAudio?.imageUrl ?? widget.audioData.imageUrl,
+    height: screenHeight * 0.35,
+    width: screenWidth * 0.7,
+    fit: BoxFit.cover,
+    placeholder: (context, url) => const Center(
+      child: CircularProgressIndicator(),
+    ),
+    errorWidget: (context, url, error) => const Icon(Icons.error),
+  ),
+)
+          );
+ 
 }
 
 

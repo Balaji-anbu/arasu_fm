@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +11,8 @@ import 'package:arasu_fm/Pages/audio_data.dart';
 import 'package:arasu_fm/Pages/audio_stream.dart';
 import 'package:arasu_fm/Providers/audio_provider.dart';
 import 'package:flutter/services.dart'; // Add this line
-import 'package:flutter/widgets.dart'; // Add this line
+import 'package:flutter/widgets.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart'; // Add this line
 
 class HomePageContent extends StatefulWidget {
   const HomePageContent({super.key});
@@ -21,8 +23,12 @@ class HomePageContent extends StatefulWidget {
 
 class _HomePageContentState extends State<HomePageContent> {
   List<AudioData> _audioList = [];
+   List<AudioData> _audioList1 = [];
   List<String> _sliderImages = [];
   bool _isLoading = true;
+final PageController _pageController = PageController();
+  // ignore: unused_field
+  int _currentPage = 0;
 
   @override
   void initState() {
@@ -33,7 +39,7 @@ class _HomePageContentState extends State<HomePageContent> {
   Future<void> _simulateLoading() async {
     await Future.delayed(const Duration(seconds: 3)); // Show shimmer for 2 seconds
     
-    await Future.wait([_fetchAudioData(), loadSliderImages()]); // Load data
+    await Future.wait([_fetchAudioData(), loadSliderImages(), fetchFeaturedPodcasts()]); // Load data
     setState(() {
       _isLoading = false; // Stop shimmer after data is loaded
     });
@@ -90,6 +96,36 @@ class _HomePageContentState extends State<HomePageContent> {
       print('Error fetching audio data: $e');
     }
   }
+
+
+
+
+  Future<void> fetchFeaturedPodcasts() async {
+    final audioProvider = Provider.of<AudioProvider>(context, listen: false);
+    try {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('featured_podcast')
+          .orderBy('timestamp', descending: true)
+          .get();
+      final List<AudioData> fetchedAudioList1 = querySnapshot.docs.map((doc) {
+        return AudioData(
+          audioUrl: doc['audioUrl'],
+          imageUrl: doc['imageUrl'],
+          title: doc['title'],
+          timestamp: doc['timestamp'],
+        );
+      }).toList();
+
+      setState(() {
+        _audioList1 = fetchedAudioList1;
+      });
+
+      audioProvider.setAudioList(_audioList1);
+    } catch (e) {
+      print('Error fetching audio data: $e');
+    }
+  }
+
 
   void _showTutorialPopup(GlobalKey key) {
     final RenderBox renderBox = key.currentContext!.findRenderObject() as RenderBox;
@@ -220,30 +256,40 @@ class _HomePageContentState extends State<HomePageContent> {
                       ),
                     ),
                   )
-                : CarouselSlider(
-                    options: CarouselOptions(
-                      height: screenSize.height * 0.25,
-                      autoPlay: true,
-                      enlargeCenterPage: true,
-                    ),
-                    items: _sliderImages.map((imageUrl) {
-                      return Builder(
-                        builder: (BuildContext context) {
-                          return Container(
-                            width: screenSize.width,
-                            margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              image: DecorationImage(
-                                image: NetworkImage(imageUrl),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    }).toList(),
-                  ),
+                : 
+CarouselSlider(
+  options: CarouselOptions(
+    height: screenSize.height * 0.25,
+    autoPlay: true,
+    enlargeCenterPage: true,
+  ),
+  items: _sliderImages.map((imageUrl) {
+    return Builder(
+      builder: (BuildContext context) {
+        return Container(
+          width: screenSize.width,
+          margin: const EdgeInsets.symmetric(horizontal: 5.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: CachedNetworkImage(
+              imageUrl: imageUrl,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => Center(
+                child: CircularProgressIndicator(),
+              ),
+              errorWidget: (context, url, error) => Center(
+                child: Icon(Icons.error, color: Colors.red),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }).toList(),
+),
             const SizedBox(height: 10),
             ScrollingTextWithGradient(
               text: "Podcasts From: Arasu Engineering College, Kumbakonam.",
@@ -280,8 +326,8 @@ class _HomePageContentState extends State<HomePageContent> {
                     child: Row(
                       children: List.generate(6, (index) {
                         return Container(
-                          width: 120,
-                          height: 120,
+                          width: 150,
+                          height: 150,
                           margin: const EdgeInsets.symmetric(horizontal: 8.0),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
@@ -322,10 +368,10 @@ class _HomePageContentState extends State<HomePageContent> {
                                       elevation: 10,
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(10),
-                                        child: Image.network(
+                                        child: CachedNetworkImage(imageUrl: 
                                           audio.imageUrl,
-                                          width: 120,
-                                          height: 120,
+                                          width: 150,
+                                          height: 150,
                                           fit: BoxFit.cover,
                                         ),
                                       ),
@@ -352,6 +398,130 @@ class _HomePageContentState extends State<HomePageContent> {
                           .toList(),
                     ),
                   ),
+                  SizedBox(height: 30,),
+                  
+                  Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: const [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10.0),
+                  child: Text(
+                    "Featured",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'metropolis',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12,),
+           
+_isLoading
+    ? Shimmer.fromColors(
+        baseColor: Colors.grey[700]!,
+        highlightColor: Colors.grey[500]!,
+        child: Row(
+          children: List.generate(2, (index) {
+            return Container(
+              width: 180,
+              height: 80,
+              margin: const EdgeInsets.symmetric(horizontal: 8.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.grey[800],
+              ),
+            );
+          }),
+        ),
+      )
+    : Column(
+        children: [
+          // Slider with PageView
+          SizedBox(
+            height: 80, // Adjust height as needed
+            child: PageView.builder(
+              itemCount: _audioList1.length,
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentPage = index;
+                });
+              },
+              itemBuilder: (context, index) {
+                final audio = _audioList1[index];
+                return GestureDetector(
+                  onTap: () {
+                    audioProvider.playAudio(audio);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AudioPlayerPage(
+                          audioUrl: audio.audioUrl,
+                          audioData: audio,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    elevation: 3,
+                    color: const Color.fromARGB(255, 36, 36, 66),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 45,
+                            backgroundColor: Colors.grey[850],
+                            backgroundImage: CachedNetworkImageProvider(audio.imageUrl),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              audio.title,
+                              style: const TextStyle(
+                                fontFamily: "metropolis",
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          // Dots Indicator
+          const SizedBox(height: 8),
+          SmoothPageIndicator(
+            controller: _pageController,
+            count: _audioList1.length,
+            effect: const WormEffect(
+              dotHeight: 8,
+              dotWidth: 8,
+              spacing: 8,
+              dotColor: Colors.grey,
+              activeDotColor: Colors.white,
+            ),
+          ),
+        ],
+      ),
+
+
+
             const SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -370,6 +540,7 @@ class _HomePageContentState extends State<HomePageContent> {
                 ),
               ],
             ),
+            SizedBox(height: 12),
             _isLoading
                 ? Shimmer.fromColors(
                     baseColor: Colors.grey[700]!,
@@ -396,7 +567,7 @@ class _HomePageContentState extends State<HomePageContent> {
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: _audioList.length > 6
-          ? (_audioList.length - 6).clamp(0, 5)
+          ? (_audioList.length - 6).clamp(0, 6)
           : 0,
       itemBuilder: (context, index) {
         final audio = _audioList[index + 6];
@@ -410,7 +581,7 @@ class _HomePageContentState extends State<HomePageContent> {
             contentPadding: const EdgeInsets.all(10.0),
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Image.network(
+              child: CachedNetworkImage(imageUrl: 
                 audio.imageUrl,
                 width: 60,
                 height: 60,
@@ -447,15 +618,33 @@ class _HomePageContentState extends State<HomePageContent> {
         );
       },
     ),
-
+    const SizedBox(height: 30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: const [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10.0),
+                  child: Text(
+                    'Continue Listening',
+                    style: TextStyle(
+                      fontFamily: 'metropolis',
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+SizedBox(height: 12,),
     // GridView for the remaining audios
-    if (_audioList.length > 11)
+    if (_audioList.length > 12)
       Padding(
         padding: const EdgeInsets.only(top: 6.0,left: 6,right: 6,bottom: 6),
         child: GridView.builder(
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
-          itemCount: _audioList.length - 11, // Remaining audios
+          itemCount: _audioList.length - 12, // Remaining audios
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2, // Number of cards per row
             crossAxisSpacing: 10,
@@ -463,7 +652,7 @@ class _HomePageContentState extends State<HomePageContent> {
             childAspectRatio: 3, // Adjust for card height/width ratio
           ),
           itemBuilder: (context, index) {
-            final audio = _audioList[index + 11];
+            final audio = _audioList[index + 12];
             return GestureDetector(
               onTap: () {
                 audioProvider.playAudio(audio);
@@ -492,7 +681,7 @@ class _HomePageContentState extends State<HomePageContent> {
                         bottom: 4,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.network(
+                          child: CachedNetworkImage(imageUrl: 
                             audio.imageUrl,
                             width: 60,
                             height: 60,
@@ -506,6 +695,7 @@ class _HomePageContentState extends State<HomePageContent> {
                         audio.title,
                         style: const TextStyle(
                           color: Colors.white,
+                          fontFamily: "metropolis",
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -524,15 +714,8 @@ class _HomePageContentState extends State<HomePageContent> {
 Text("Ohh! You Reached End",style: TextStyle(color: Colors.white,fontFamily: "metropolis",fontSize: 16),),
 Text("Go To Video Section To Explore More!",style: TextStyle(color: Colors.white,fontFamily: "metropolis",fontSize: 16),),
 
-Column(mainAxisAlignment: MainAxisAlignment.start,
-  children: [
-    Padding(
-      padding: const EdgeInsets.only(right: 100),
-      child: Lottie.asset("assets/end.json"),
-    ),
-  ],
-),
-            SizedBox(height: 110),
+
+            SizedBox(height: 150),
           ],
         ),
       ),

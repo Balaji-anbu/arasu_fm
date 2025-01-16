@@ -171,6 +171,7 @@ class _AudioPlayerOverlayState extends State<AudioPlayerOverlay> with SingleTick
               audioProvider.currentAudio?.title ?? "Playing...",
               style: const TextStyle(
                 color: Colors.white,
+                fontFamily: "metropolis",
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),

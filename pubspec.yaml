@@ -63,6 +63,9 @@ dependencies:
   shimmer: ^3.0.0
   chewie: ^1.9.2
   webview_flutter: ^4.10.0
+  connectivity_plus: ^6.1.2
+  onesignal_flutter: ^5.2.9
+  smooth_page_indicator: ^1.2.0+3
   
 
 dev_dependencies:
@@ -156,7 +159,7 @@ flutter_native_splash:
   # splash screen to a png image.  This is useful for gradients. The image will be stretch to the
   # size of the app. Only one parameter can be used, color and background_image cannot both be set.
   color: "#42a5f5"
-  background_image: "assets/splash_back.png"
+  #background_image: "assets/splash_back.png"
 
   # Optional parameters are listed below.  To enable a parameter, uncomment the line by removing
   # the leading # character.
@@ -182,10 +185,10 @@ flutter_native_splash:
   # parameters from above. If the image_dark parameter is specified, color_dark or
   # background_image_dark must be specified.  color_dark and background_image_dark cannot both be
   # set.
-  #color_dark: "#042a49"
+  color_dark: "#042a49"
   #background_image_dark: "assets/dark-background.png"
   image_dark: assets/arasufm_dark.png
-  #branding_dark: assets/brand_dark.png
+  branding_dark: assets/brand_dark.png
 
   # From Android 12 onwards, the splash screen is handled differently than in previous versions.
   # Please visit https://developer.android.com/guide/topics/ui/splash-screen
@@ -210,6 +213,8 @@ flutter_native_splash:
 
     # The branding property allows you to specify an image used as branding in the splash screen.
     branding: assets/brand_light.png
+    branding_dark: assets/brand_dark.png
+
 
     # The image_dark, color_dark, icon_background_color_dark, and branding_dark set values that
     # apply when the device is in dark mode. If they are not specified, the app will use the
@@ -232,13 +237,13 @@ flutter_native_splash:
   #color_dark_ios: "#042a49"
   #color_web: "#42a5f5"
   #color_dark_web: "#042a49"
-  #image_android: assets/splash-android.png
-  #image_dark_android: assets/splash-invert-android.png
+  image_android: assets/arasufm_light.png
+  image_dark_android: assets/arasufm_dark.png
   #image_ios: assets/splash-ios.png
   #image_dark_ios: assets/splash-invert-ios.png
   #image_web: assets/splash-web.gif
   #image_dark_web: assets/splash-invert-web.gif
-  background_image_android: "assets/splash_back.png"
+  #background_image_android: "assets/splash_back.png"
   #background_image_dark_android: "assets/dark-background-android.png"
   #background_image_ios: "assets/background-ios.png"
   #background_image_dark_ios: "assets/dark-background-ios.png"
@@ -246,7 +251,7 @@ flutter_native_splash:
   #background_image_dark_web: "assets/dark-background-web.png"
   branding_android: assets/brand_light.png
   branding_bottom_padding_android: 24
-  #branding_dark_android: assets/brand_dark.png
+  branding_dark_android: assets/brand_dark.png
   #branding_ios: assets/brand-ios.png
   #branding_bottom_padding_ios: 24
   #branding_dark_ios: assets/dart_dark-ios.png

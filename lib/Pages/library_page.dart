@@ -21,7 +21,7 @@ class LikedPodcastPage extends StatelessWidget {
           iconTheme: IconThemeData(color: Colors.white),
           title: const Text(
             "Your's Library",
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.white,fontFamily: "metropolis"),
           ),
           backgroundColor: const Color(0xff213555),
         ),

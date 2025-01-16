@@ -12,7 +12,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 
-import 'package:webview_flutter/webview_flutter.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -20,7 +19,6 @@ class ProfilePage extends StatefulWidget {
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
-
 class _ProfilePageState extends State<ProfilePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   User? currentUser;
@@ -73,169 +71,176 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
- @override
-Widget build(BuildContext context) {
-  final size = MediaQuery.of(context).size;
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final toolbarHeight = size.height * 0.2; // Adjusting height to 20% of screen height
 
-  return Scaffold(
-    backgroundColor: const Color.fromARGB(255, 2, 15, 27),
-    body: Column(
-      children: [
-        // Toolbar with custom height and profile image
-        Container(
-          height: 200,
-          color: const Color.fromARGB(255, 2, 15, 27),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2.0),
-                ),
-                child: currentUser?.photoURL != null &&
-                        currentUser!.photoURL!.isNotEmpty
-                    ? ClipOval(
-                        child: Image.network(
-                          currentUser!.photoURL!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return _fallbackAvatar();
-                          },
-                        ),
-                      )
-                    : _fallbackAvatar(),
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: CustomScrollView(
-            slivers: [
-              SliverList(
-                delegate: SliverChildListDelegate(
-                  [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 20),
-                          const Text(
-                            'Signed in with',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontFamily: 'metropolis',
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            currentUser?.email ?? 'No Email',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              color: Colors.greenAccent,
-                              fontFamily: 'metropolis',
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const Divider(height: 32),
-                          ..._buildListItems(),
-                          const Divider(height: 32),
-                          ListTile(
-                            title: const Text(
-                              'Report Bug',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.red,
-                                fontFamily: 'metropolis',
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            leading: const Icon(
-                              Icons.bug_report,
-                              color: Colors.red,
-                            ),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => BugReportingPage()),
-                              );
-                            },
-                          ),
-                          ListTile(
-                            title: const Text(
-                              'Logout',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.red,
-                                fontFamily: 'metropolis',
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            leading: const Icon(
-                              Icons.exit_to_app,
-                              color: Colors.red,
-                            ),
-                            onTap: () async {
-                              bool? shouldLogout = await showDialog<bool>(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    backgroundColor: Colors.grey[900],
-                                    title: const Text(
-                                      'Confirm Logout',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    content: const Text(
-                                      'Are you sure you want to log out?',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(false),
-                                        child: const Text(
-                                          'Cancel',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(true),
-                                        child: const Text(
-                                          'Logout',
-                                          style: TextStyle(color: Colors.red),
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                              if (shouldLogout == true) {
-                                await logout();
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 30),
-                        ],
-                      ),
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 2, 15, 27),
+      body: Column(
+        children: [
+          // Toolbar with custom height and profile image
+          Center(
+            child: Container(
+              height: toolbarHeight,
+              color: const Color.fromARGB(255, 2, 15, 27),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 85,
+                    height: 85,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2.0),
                     ),
-                  ],
-                ),
+                    child: currentUser?.photoURL != null &&
+                            currentUser!.photoURL!.isNotEmpty
+                        ? ClipOval(
+                            child: Image.network(
+                              currentUser!.photoURL!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return _fallbackAvatar();
+                              },
+                            ),
+                          )
+                        : _fallbackAvatar(),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
-
+          Expanded(
+            child: CustomScrollView(
+              slivers: [
+                SliverList(
+                  delegate: SliverChildListDelegate(
+                    [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 1),
+                            const Text(
+                              'Signed in with',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontFamily: 'metropolis',
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              currentUser?.email ?? 'No Email',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                color: Colors.greenAccent,
+                                fontFamily: 'metropolis',
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const Divider(height: 32),
+                            ..._buildListItems(),
+                            const Divider(height: 32),
+                            ListTile(
+                              title: const Text(
+                                'Report Bug',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.red,
+                                  fontFamily: 'metropolis',
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              leading: const Icon(
+                                Icons.bug_report,
+                                color: Colors.red,
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => BugReportingPage()),
+                                );
+                              },
+                            ),
+                            ListTile(
+                              title: const Text(
+                                'Logout',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.red,
+                                  fontFamily: 'metropolis',
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              leading: const Icon(
+                                Icons.exit_to_app,
+                                color: Colors.red,
+                              ),
+                              onTap: () async {
+                                bool? shouldLogout = await showDialog<bool>(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      backgroundColor: Colors.grey[900],
+                                      title: const Text(
+                                        'Confirm Logout',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      content: const Text(
+                                        'Are you sure you want to log out?',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(false),
+                                          child: const Text(
+                                            'Cancel',
+                                            style: TextStyle(color: Colors.white),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(true),
+                                          child: const Text(
+                                            'Logout',
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                                if (shouldLogout == true) {
+                                  await logout();
+                                }
+                              },
+                            ),
+                            Row(mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text("App Version : 1.0.0",style: TextStyle(color: Colors.grey,fontFamily: "metropolis"),),
+                              ],
+                            ),
+                            SizedBox(height: 130,),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _fallbackAvatar() {
     String initials = currentUser?.email?.substring(0, 1).toUpperCase() ?? "?";
@@ -254,18 +259,12 @@ Widget build(BuildContext context) {
 
   List<Widget> _buildListItems() {
     return [
-      _buildListTile('Visit Website', Icons.web_asset, Colors.grey, () async {
-  String? url = await _getWebsiteLink();
-  if (url != null) {
-    // Open the URL in WebView
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => WebViewScreen(url: url),
-      ),
-    );
-  }
-}),
+       _buildListTile('Visit Website', Icons.web_asset, Colors.grey, () async {
+        String? url = await _getWebsiteLink();
+        if (url != null && await canLaunch(url)) {
+          await launch(url);
+        }
+      }),
       _buildListTile('About FM', Icons.info, Colors.grey, () {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => AboutPage()));
@@ -332,39 +331,6 @@ Widget build(BuildContext context) {
       ),
       leading: Icon(icon, color: iconColor),
       onTap: onTap,
-    );
-  }
-}
-
-class WebViewScreen extends StatefulWidget {
-  final String url;
-  WebViewScreen({required this.url});
-
-  @override
-  _WebViewScreenState createState() => _WebViewScreenState();
-}
-
-class _WebViewScreenState extends State<WebViewScreen> {
-  late WebViewController _webViewController;
-
-  @override
-  void initState() {
-    super.initState();
-    WebViewPlatform.instance;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Website'),
-      ),
-      body: WebView(
-        initialUrl: widget.url,
-        onWebViewCreated: (WebViewController webViewController) {
-          _webViewController = webViewController;
-        },
-      ),
     );
   }
 }

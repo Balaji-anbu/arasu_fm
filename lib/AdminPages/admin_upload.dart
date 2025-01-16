@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:arasu_fm/model/push_notification.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
@@ -17,6 +18,8 @@ class _UploadPageState extends State<UploadPage> {
   File? _audioFile;
   String? _title;
   bool _isUploading = false;
+  String? _imageFileName;
+  String? _audioFileName;
 
   // Authenticate with Google Drive API
   Future<drive.DriveApi> authenticateWithGoogle() async {
@@ -70,6 +73,7 @@ class _UploadPageState extends State<UploadPage> {
         'audioId': audioId,
         'timestamp': FieldValue.serverTimestamp(),
       });
+      await sendPushNotification(title: 'New Podcast', message: 'New Podcast is just Arrived, Tap To Listen!');
     } catch (e) {
       throw Exception('Error storing data in Firestore: $e');
     }
@@ -91,6 +95,7 @@ class _UploadPageState extends State<UploadPage> {
     if (result != null) {
       setState(() {
         _imageFile = File(result.files.single.path!);
+        _imageFileName = result.files.single.name;  // Store the image file name
       });
     }
   }
@@ -101,6 +106,7 @@ class _UploadPageState extends State<UploadPage> {
     if (result != null) {
       setState(() {
         _audioFile = File(result.files.single.path!);
+        _audioFileName = result.files.single.name;  // Store the audio file name
       });
     }
   }
@@ -158,26 +164,51 @@ class _UploadPageState extends State<UploadPage> {
 
   // Delete media entry
   Future<void> deleteMediaEntry(DocumentSnapshot document) async {
-    try {
-      final imageId = document['imageId'];
-      final audioId = document['audioId'];
+    // Show a confirmation dialog
+    bool shouldDelete = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Delete Media Entry'),
+        content: Text('Are you sure you want to delete "${document['title']}"?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+            child: Text('Delete'),
+          ),
+        ],
+      ),
+    );
 
-      // Delete files from Google Drive
-      await deleteFileFromGoogleDrive(imageId);
-      await deleteFileFromGoogleDrive(audioId);
+    if (shouldDelete) {
+      try {
+        final imageId = document['imageId'];
+        final audioId = document['audioId'];
 
-      // Delete Firestore document
-      await document.reference.delete();
+        // Delete files from Google Drive
+        await deleteFileFromGoogleDrive(imageId);
+        await deleteFileFromGoogleDrive(audioId);
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Media entry deleted successfully!'),
-        backgroundColor: Colors.orange,
-      ));
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error deleting media: $e'),
-        backgroundColor: Colors.red,
-      ));
+        // Delete Firestore document
+        await document.reference.delete();
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Media entry deleted successfully!'),
+          backgroundColor: Colors.orange,
+        ));
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error deleting media: $e'),
+          backgroundColor: Colors.red,
+        ));
+      }
     }
   }
 
@@ -259,6 +290,14 @@ class _UploadPageState extends State<UploadPage> {
                         ),
                       ],
                     ),
+                    SizedBox(height: 8),
+                    // Display the image thumbnail
+                    Image.network(
+                      document['imageUrl'],
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    ),
                   ],
                 ),
                 trailing: InkWell(
@@ -289,21 +328,72 @@ class _UploadPageState extends State<UploadPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Upload Media', style: TextStyle(fontFamily: 'metropolis')),
-        backgroundColor: Colors.teal,
-      ),
+          title: Text(
+            'Upload Podcasts',
+            style: TextStyle(
+              fontFamily: 'metropolis',
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          backgroundColor: Colors.teal,
+          actions: [
+           Padding(
+  padding: const EdgeInsets.all(8.0),
+  child: IconButton(
+    icon: Icon(Icons.info, size: 30, color: Colors.black),
+    onPressed: () {
+      // Show the bottom sheet when the icon is tapped
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,  // Allow bottom sheet to grow in height
+        builder: (BuildContext context) {
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'Important Notes:',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text('Note 1: Images must be in size of below 200 kb'),
+                Text('Note 2: 512 x 512 pixels is best suitable'),
+                Text('Note 3: Audio File must be in Mp3 format'),
+                Text('Note 4: Wait until the upload process complete.'),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  ),
+)
+
+          ],
+        ),
       body: Stack(
         children: [
           Column(
             children: [
+              
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: TextField(
                   decoration: InputDecoration(
                     labelText: 'Title',
+                    labelStyle: TextStyle(color: Colors.grey[600]),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    filled: true,
+                    fillColor: Colors.grey[100],
                   ),
                   onChanged: (value) {
                     setState(() {
@@ -315,36 +405,113 @@ class _UploadPageState extends State<UploadPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  ElevatedButton.icon(
-                    onPressed: _pickImageFile,
-                    icon: Icon(Icons.image),
-                    label: Text('Pick Image',
-                        style: TextStyle(fontFamily: 'metropolis')),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal,
+                  InkWell(
+                    onTap: _pickImageFile,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Ink(
+                      decoration: BoxDecoration(
+                        color: Colors.teal,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 24,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.image, color: Colors.white),
+                          SizedBox(width: 8),
+                          Text(
+                            'Pick Image',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  ElevatedButton.icon(
-                    onPressed: _pickAudioFile,
-                    icon: Icon(Icons.audiotrack),
-                    label: Text('Pick Audio',
-                        style: TextStyle(fontFamily: 'metropolis')),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal,
+                  InkWell(
+                    onTap: _pickAudioFile,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Ink(
+                      decoration: BoxDecoration(
+                        color: Colors.teal,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 24,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.audiotrack, color: Colors.white),
+                          SizedBox(width: 8),
+                          Text(
+                            'Pick Audio',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _uploadFiles,
-                child: Text(
-                  'Upload',
-                  style: TextStyle(fontFamily: 'metropolis'),
+              if (_imageFile != null)
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image.file(
+                        _imageFile!,
+                        width: double.infinity,
+                        height: 200,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        _imageFileName ?? 'No image selected',
+                        style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                      ),
+                    ),
+                  ],
                 ),
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                  backgroundColor: Colors.teal,
+              if (_audioFile != null)
+                Column(
+                  children: [
+                    SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        _audioFileName ?? 'No audio selected',
+                        style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                      ),
+                    ),
+                  ],
+                ),
+              SizedBox(height: 20),
+              InkWell(
+                onTap: _uploadFiles,
+                borderRadius: BorderRadius.circular(12),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    color: Colors.teal,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 48,
+                  ),
+                  child: Text(
+                    'Upload',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
               Expanded(

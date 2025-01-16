@@ -36,127 +36,147 @@ class AboutDeveloperPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[900],
+      backgroundColor: Colors.transparent, // Make Scaffold's background transparent
       body: Stack(
         children: [
-          // Background Image
+          // Background Image as Scaffold background
           Positioned.fill(
-            child: Image.asset(
-              'assets/back.jpg', // Add your background image here
-              fit: BoxFit.cover,
+            child: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/back.jpg'), // Your background image here
+                  fit: BoxFit.cover, // Ensures the image covers the entire screen
+                ),
+              ),
             ),
           ),
           // Semi-transparent overlay for better contrast
           Positioned.fill(
             child: Container(
-              color: Colors.black.withOpacity(0.6),
+              color: Colors.black.withOpacity(0.6), // Dark overlay for text contrast
             ),
           ),
           // Content
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(height: 20),
-                  SizedBox(height: 100),
-                  Text(
-                    'Balaji A',
-                    style: GoogleFonts.poppins(
-                      fontSize: 32,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    'Flutter Developer',
-                    style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    'Final Year CSE Department',
-                    style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[400],
-                    ),
-                  ),
-                  Text(
-                    'Arasu Engineering College',
-                    style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[400],
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    'Passionate about creating seamless, user-friendly mobile applications with modern UI/UX and efficient architecture.',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      color: Colors.grey[300],
-                      height: 1.5,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 100),
-                  Text(
-                    'Get In Touch ',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'metropolis',
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween, // Pushes content to top and bottom
+            children: [
+              // Top content
+              SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column( mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      IconButton(
-                        icon: Image.asset(
-                          'assets/linkedin.png',
-                          height: 50,
-                          width: 50,
+                      SizedBox(height: 100),
+                      Text(
+                        'Balaji A',
+                        style: GoogleFonts.poppins(
+                          fontSize: 32,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
-                        iconSize: 30,
-                        onPressed: () => _launchUrl(linkedInUrl),
                       ),
-                      IconButton(
-                        icon: Image.asset(
-                          'assets/instagram.png',
-                          height: 50,
-                          width: 50,
+                      SizedBox(height: 2),
+                      Text(
+                        'Flutter Developer',
+                        style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[600],
                         ),
-                        iconSize: 30,
-                        onPressed: () => _launchUrl(instagramUrl),
                       ),
-                      IconButton(
-                        icon: Image.asset(
-                          'assets/github.png',
-                          height: 50,
-                          width: 50,
+                      SizedBox(height: 20),
+                      Text(
+                        'Final Year CSE Department',
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[400],
                         ),
-                        iconSize: 30,
-                        onPressed: () => _launchUrl(githubUrl),
                       ),
-                      IconButton(
-                        icon: Image.asset(
-                          'assets/mail.png',
-                          height: 48,
-                          width: 45,
+                      Text(
+                        'Arasu Engineering College',
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[400],
                         ),
-                        iconSize: 30,
-                        onPressed: () => _openGmailApp(email),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        'Passionate about creating seamless, user-friendly mobile applications with modern UI/UX and efficient architecture.',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          color: Colors.grey[300],
+                          height: 1.5,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
+              // Spacer to push "Get In Touch" to the bottom
+              Spacer(),
+              // Bottom content
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Text(
+                      'Get In Touch ',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'metropolis',
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: Image.asset(
+                            'assets/linkedin.png',
+                            height: 50,
+                            width: 50,
+                          ),
+                          iconSize: 30,
+                          onPressed: () => _launchUrl(linkedInUrl),
+                        ),
+                        IconButton(
+                          icon: Image.asset(
+                            'assets/instagram.png',
+                            height: 50,
+                            width: 50,
+                          ),
+                          iconSize: 30,
+                          onPressed: () => _launchUrl(instagramUrl),
+                        ),
+                        IconButton(
+                          icon: Image.asset(
+                            'assets/github.png',
+                            height: 50,
+                            width: 50,
+                          ),
+                          iconSize: 30,
+                          onPressed: () => _launchUrl(githubUrl),
+                        ),
+                        IconButton(
+                          icon: Image.asset(
+                            'assets/mail.png',
+                            height: 48,
+                            width: 45,
+                          ),
+                          iconSize: 30,
+                          onPressed: () => _openGmailApp(email),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12,),
+                    Text("NightSpace Technologies",style: TextStyle(color: Colors.grey,fontFamily: "metropolis",))
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
