@@ -31,7 +31,7 @@ class _BugReportingPageState extends State<BugReportingPage> {
           'timestamp': FieldValue.serverTimestamp(),
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Bug report submitted successfully!')),
+          const SnackBar(content: Text('Bug report submitted successfully!')),
         );
         // Clear the form
         _titleController.clear();
@@ -50,22 +50,23 @@ class _BugReportingPageState extends State<BugReportingPage> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 2, 15, 27),
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.grey[900],
-        title: Text(
+        title: const Text(
           'Report Bug',
           style: TextStyle(
               color: Colors.white,
               fontFamily: 'metropolis',
               fontWeight: FontWeight.bold),
         ),
+        // ignore: prefer_const_literals_to_create_immutables
         actions: [
-          Icon(
+           const Icon(
             Icons.bug_report,
             color: Colors.teal,
             size: 34,
           ),
-          SizedBox(
+          const SizedBox(
             width: 20,
           )
         ],
@@ -88,7 +89,7 @@ class _BugReportingPageState extends State<BugReportingPage> {
                   controller: _titleController,
                   decoration: InputDecoration(
                     hintText: 'Enter the title of the bug',
-                    hintStyle: TextStyle(fontFamily: 'metropolis'),
+                    hintStyle: const TextStyle(fontFamily: 'metropolis'),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -108,7 +109,7 @@ class _BugReportingPageState extends State<BugReportingPage> {
                   maxLines: 6,
                   decoration: InputDecoration(
                     hintText: 'Describe the bug in detail',
-                    hintStyle: TextStyle(fontFamily: 'metropolis'),
+                    hintStyle: const TextStyle(fontFamily: 'metropolis'),
                     alignLabelWithHint: true,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
@@ -128,7 +129,7 @@ class _BugReportingPageState extends State<BugReportingPage> {
                   controller: _emailController,
                   decoration: InputDecoration(
                     hintText: 'Enter your email (optional)',
-                    hintStyle: TextStyle(fontFamily: 'metropolis'),
+                    hintStyle: const TextStyle(fontFamily: 'metropolis'),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -144,20 +145,20 @@ class _BugReportingPageState extends State<BugReportingPage> {
                   },
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               Center(
                 child: ElevatedButton(
                   onPressed: _submitBugReport,
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                     backgroundColor: Colors.greenAccent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                   ),
-                  child: Text('Submit Bug Report',
+                  child: const Text('Submit Bug Report',
                       style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'metropolis',
@@ -176,15 +177,15 @@ class _BugReportingPageState extends State<BugReportingPage> {
       {required String title, String? content, Widget? child}) {
     return Card(
       color: Colors.grey[900], // Light color card for contrast
-      margin: EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 fontFamily: 'metropolis',
                 fontWeight: FontWeight.bold,
@@ -192,10 +193,10 @@ class _BugReportingPageState extends State<BugReportingPage> {
               ),
             ),
             if (content != null) ...[
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
                 content,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontFamily: 'metropolis',
                   color: Colors.white,
@@ -204,7 +205,7 @@ class _BugReportingPageState extends State<BugReportingPage> {
               ),
             ],
             if (child != null) ...[
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               child,
             ],
           ],

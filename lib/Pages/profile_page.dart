@@ -12,13 +12,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 
-
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
+
 class _ProfilePageState extends State<ProfilePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   User? currentUser;
@@ -48,7 +48,7 @@ class _ProfilePageState extends State<ProfilePage> {
       await _auth.signOut();
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Onboarding()),
+        MaterialPageRoute(builder: (context) => const Onboarding()),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -65,7 +65,8 @@ class _ProfilePageState extends State<ProfilePage> {
           .collection('weblink')
           .doc('finallink')
           .get();
-      return doc['link'];
+      String? url = doc['link'];
+      return url;
     } catch (e) {
       return null;
     }
@@ -74,13 +75,12 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final toolbarHeight = size.height * 0.2; // Adjusting height to 20% of screen height
+    final toolbarHeight = size.height * 0.2;
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 2, 15, 27),
       body: Column(
         children: [
-          // Toolbar with custom height and profile image
           Center(
             child: Container(
               height: toolbarHeight,
@@ -164,7 +164,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => BugReportingPage()),
+                                      builder: (context) =>
+                                           BugReportingPage()),
                                 );
                               },
                             ),
@@ -202,7 +203,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                               Navigator.of(context).pop(false),
                                           child: const Text(
                                             'Cancel',
-                                            style: TextStyle(color: Colors.white),
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
                                         ),
                                         TextButton(
@@ -210,7 +212,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                               Navigator.of(context).pop(true),
                                           child: const Text(
                                             'Logout',
-                                            style: TextStyle(color: Colors.red),
+                                            style:
+                                                TextStyle(color: Colors.red),
                                           ),
                                         ),
                                       ],
@@ -222,12 +225,18 @@ class _ProfilePageState extends State<ProfilePage> {
                                 }
                               },
                             ),
-                            Row(mainAxisAlignment: MainAxisAlignment.center,
+                            const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text("App Version : 1.0.0",style: TextStyle(color: Colors.grey,fontFamily: "metropolis"),),
+                                Text(
+                                  "App Version : 1.0.0",
+                                  style: TextStyle(
+                                      color: Colors.grey,
+                                      fontFamily: "metropolis"),
+                                ),
                               ],
                             ),
-                            SizedBox(height: 130,),
+                            const SizedBox(height: 130),
                           ],
                         ),
                       ),
@@ -259,25 +268,39 @@ class _ProfilePageState extends State<ProfilePage> {
 
   List<Widget> _buildListItems() {
     return [
-       _buildListTile('Visit Website', Icons.web_asset, Colors.grey, () async {
-        String? url = await _getWebsiteLink();
-        if (url != null && await canLaunch(url)) {
-          await launch(url);
-        }
-      }),
+    _buildListTile('Visit Website', Icons.web_asset, Colors.grey, () async {
+  try {
+    String? url = await _getWebsiteLink(); // Fetch the website link
+    if (url != null && url.isNotEmpty) {
+      await launch(
+        url,
+        
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Website link not found.')),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error launching website: $e')),
+    );
+  }
+}),
+
       _buildListTile('About FM', Icons.info, Colors.grey, () {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => AboutPage()));
       }),
       _buildListTile('Our Team', Icons.people, Colors.grey, () {
         Navigator.push(context,
-            MaterialPageRoute(builder: (context) => TeamMembersPage()));
+            MaterialPageRoute(builder: (context) =>  TeamMembersPage()));
       }),
       _buildListTile(
           'About Developer', Icons.developer_mode_outlined, Colors.grey, () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => AboutDeveloperPage()),
+          MaterialPageRoute(builder: (context) =>  AboutDeveloperPage()),
         );
       }),
       _buildListTile('Share App', Icons.share, Colors.grey, () {

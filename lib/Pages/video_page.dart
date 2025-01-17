@@ -4,10 +4,10 @@ import 'package:arasu_fm/Providers/video_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class VideoPage extends StatefulWidget {
   const VideoPage({Key? key}) : super(key: key);
@@ -24,16 +24,14 @@ class _VideoPageState extends State<VideoPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final videoProvider = context.read<VideoProvider>();
-      videoProvider.fetchVideos(); // Automatically load videos
+      videoProvider.fetchVideos();
       videoProvider.fetchSubscriberCount();
 
-      // Add a timer to check for loading state and refresh until data loads
       _refreshTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
         if (!videoProvider.isLoading && videoProvider.videos.isNotEmpty) {
-          // Stop refreshing when videos are loaded
           _refreshTimer.cancel();
         } else {
-          videoProvider.fetchVideos(); // Keep fetching until data is loaded
+          videoProvider.fetchVideos();
         }
       });
     });
@@ -41,7 +39,7 @@ class _VideoPageState extends State<VideoPage> {
 
   @override
   void dispose() {
-    _refreshTimer.cancel(); // Clean up the timer when the page is disposed
+    _refreshTimer.cancel();
     super.dispose();
   }
 
@@ -58,35 +56,39 @@ class _VideoPageState extends State<VideoPage> {
             fontFamily: 'metropolis',
             fontWeight: FontWeight.bold,
           ),
-        ),actions: [
-  TextButton(
-    onPressed: () {
-      final channelId = context.read<VideoProvider>().channelId;
-      final url = 'https://www.youtube.com/channel/$channelId';
-      launchUrl(Uri.parse(url));
-    },
-    style: TextButton.styleFrom(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-    ),
-    child: Row(
-      children: [
-        SizedBox(
-          height: 40, // Adjust the size to fit your design
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 4),
-            child: Lottie.asset("assets/subscribe.json"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              final channelId = context.read<VideoProvider>().channelId;
+              final url = 'https://www.youtube.com/channel/$channelId';
+              launchUrl(Uri.parse(url));
+            },
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            ),
+            child: Row(
+              children: [
+                SizedBox(
+                  height: 40,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Lottie.asset("assets/subscribe.json"),
+                  ),
+                ),
+                const SizedBox(width: 2),
+                const Text(
+                  'Subscribe',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: "metropolis",
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(width: 2), // Add spacing between animation and text
-        const Text(
-          'Subscribe',
-          style: TextStyle(color: Colors.white,fontFamily: "metropolis",fontSize: 18,fontWeight: FontWeight.bold),
-        ),
-      ],
-    ),
-  ),
-],
-
+        ],
       ),
       body: Consumer<VideoProvider>(
         builder: (context, videoProvider, child) {
@@ -94,7 +96,7 @@ class _VideoPageState extends State<VideoPage> {
             return Center(child: Lottie.asset("assets/load.json"));
           }
 
-          final videos = videoProvider.videos.toList(); // Latest videos on top
+          final videos = videoProvider.videos.toList();
 
           return NotificationListener<ScrollNotification>(
             onNotification: (ScrollNotification scrollInfo) {
@@ -105,46 +107,88 @@ class _VideoPageState extends State<VideoPage> {
               return false;
             },
             child: ListView.builder(
-  itemCount: videos.length + (videoProvider.isLoadingMore ? 1 : 0),
-  itemBuilder: (context, index) {
-    if (index < videos.length) {
-      final video = videos[index];
-      return _buildVideoCard(video);
-    } else {
-      return Center(child: Lottie.asset("assets/load.json"));
-    }
-  },
-)
-
+              itemCount: videos.length + (videoProvider.isLoadingMore ? 1 : 0),
+              itemBuilder: (context, index) {
+                if (index < videos.length) {
+                  final video = videos[index];
+                  return _buildVideoCard(video);
+                } else {
+                  return Center(child: Lottie.asset("assets/load.json"));
+                }
+              },
+            ),
           );
         },
       ),
     );
   }
 
-
   Widget _buildVideoCard(Map<String, dynamic> video) {
     return GestureDetector(
       onTap: () {
-        showDialog(barrierColor: const Color.fromARGB(255, 2, 15, 27),
-        barrierDismissible: false,
-          context: context,
-          builder: (_) {
-            return Dialog(
-              
-              insetPadding: const EdgeInsets.all(1),
-              child: YoutubePlayer(
-                controller: YoutubePlayerController(
-                  initialVideoId: video['videoId'],
-                  flags: const YoutubePlayerFlags(
-                    autoPlay: true,
-                    mute: false,
-                  ),
+    showDialog(
+  barrierColor: const Color.fromARGB(255, 2, 15, 27),
+  barrierDismissible: false,
+  context: context,
+  builder: (_) {
+    final controller = YoutubePlayerController(
+      params: const YoutubePlayerParams(
+        showFullscreenButton: false,
+        showControls: true,
+        mute: false,
+      ),
+    )..loadVideoById(videoId: video['videoId']); // Load the video ID
+
+    return Dialog(
+      insetPadding: const EdgeInsets.all(8), // Adjust padding for the dialog
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [const SizedBox(height: 50,),
+              // Video Player Section
+              AspectRatio(
+                aspectRatio: 16 / 9,
+                child: YoutubePlayerScaffold(
+                  controller: controller,
+                  builder: (context, player) {
+                    return player;
+                  },
                 ),
               ),
-            );
-          },
-        );
+              const SizedBox(height: 50),
+              // Title Section
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  video['title'],
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'metropolis',
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 80),
+            ],
+          ),
+        ),
+      ),
+    );
+  },
+);
+
+
       },
       child: Card(
         color: Colors.grey[900],
@@ -190,7 +234,7 @@ class _VideoPageState extends State<VideoPage> {
               child: Text(
                 video['title'],
                 style: const TextStyle(
-                  color: Colors.white, 
+                  color: Colors.white,
                   fontFamily: "metropolis",
                   fontWeight: FontWeight.bold,
                   fontSize: 16,

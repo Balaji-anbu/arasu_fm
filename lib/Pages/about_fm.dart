@@ -5,8 +5,8 @@ class AboutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
-        title: Text(
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
           'About us',
           style: TextStyle(
               color: Colors.white,
@@ -19,7 +19,7 @@ class AboutPage extends StatelessWidget {
       body: Container(
         color: Colors.black, // Dark background
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -87,25 +87,25 @@ class SectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: Colors.grey[900], // Light color card for contrast
-      margin: EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 fontFamily: 'Metropolis',
                 fontWeight: FontWeight.bold,
                 color: Colors.greenAccent,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               content,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 fontFamily: 'metropolis',
                 color: Colors.white,

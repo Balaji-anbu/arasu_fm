@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:arasu_fm/AdminPages/admin_home.dart';
 import 'package:arasu_fm/Pages/home_page.dart';
 import 'package:arasu_fm/Pages/onboarding.dart';
 import 'package:arasu_fm/Providers/audio_provider.dart';
 import 'package:arasu_fm/Providers/video_provider.dart';
 import 'package:arasu_fm/controllers/login_controller.dart';
+import 'package:arasu_fm/model/splash_screen_animation.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -56,14 +59,13 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AudioProvider()),
         ChangeNotifierProvider(create: (_) => LoginController()),
       ],
-      child: MaterialApp(
+      child: const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: const AuthWrapper(),
+        home: SplashScreen(),
       ),
     );
   }
-}
-class AuthWrapper extends StatefulWidget {
+}class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
 
   @override
@@ -73,21 +75,39 @@ class AuthWrapper extends StatefulWidget {
 class _AuthWrapperState extends State<AuthWrapper> {
   DateTime? lastPressedTime;
   bool isOffline = false;
+  bool isInitializing = true;
+  late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
 
   @override
   void initState() {
     super.initState();
     _checkInternetConnection();
+    
     // Add listener for connectivity changes
-    Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) {
-      _updateConnectionStatus(results.first); // Use the first result
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) {
+      _updateConnectionStatus(results.first);
     });
+
+    // Set initializing to false after initial auth check
+    FirebaseAuth.instance.authStateChanges().first.then((_) {
+      if (mounted) {
+        setState(() {
+          isInitializing = false;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
   }
 
   // Method to check internet connection
   Future<void> _checkInternetConnection() async {
     final results = await Connectivity().checkConnectivity();
-    _updateConnectionStatus(results.first); // Use the first result
+    _updateConnectionStatus(results.first);
   }
 
   // Update connection status
@@ -102,13 +122,16 @@ class _AuthWrapperState extends State<AuthWrapper> {
     return WillPopScope(
       onWillPop: () async {
         DateTime now = DateTime.now();
-        if (lastPressedTime == null || now.difference(lastPressedTime!) > Duration(seconds: 2)) {
+        if (lastPressedTime == null ||
+            now.difference(lastPressedTime!) > const Duration(seconds: 2)) {
           lastPressedTime = now;
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Do That Again! To Exit.'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 2),
-          ));
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Do That Again! To Exit.'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 2),
+            ),
+          );
           return false;
         } else {
           SystemNavigator.pop();
@@ -118,16 +141,30 @@ class _AuthWrapperState extends State<AuthWrapper> {
       child: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
+          // Check for offline state first
           if (isOffline) {
             return const NoInternetPage();
           }
 
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Scaffold(backgroundColor: Color.fromARGB(255, 2, 15, 27),
-              body: Center(child: Lottie.asset('assets/loading.json')),
+          // Only show loading on initial app launch
+          if (isInitializing) {
+            return const Scaffold(
+              backgroundColor: Color.fromARGB(255, 2, 15, 27),
+              body: Center(
+                child: Text(
+                  'Loading...',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    fontFamily: "metropolis",
+                  ),
+                ),
+              ),
             );
           }
 
+          // For subsequent auth state changes, maintain current UI
           if (snapshot.connectionState == ConnectionState.active) {
             if (snapshot.hasData) {
               final user = snapshot.data;
@@ -141,11 +178,10 @@ class _AuthWrapperState extends State<AuthWrapper> {
             } else {
               return const Onboarding();
             }
-          } else {
-            return Center(
-              child: Lottie.asset('assets/loading.json'),
-            );
           }
+
+          // Keep showing current page while waiting
+          return Container(color: Colors.transparent,);
         },
       ),
     );
@@ -164,13 +200,13 @@ class NoInternetPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Lottie.asset('assets/404.json', width: 300, height: 350),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'No Internet Connection!',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,fontFamily:"metropolis",color: Colors.red),
             ),
-            SizedBox(height: 10),
-            Text(
+            const SizedBox(height: 10),
+            const Text(
               'Please Check Your Internet Settings And Try Again',
               style: TextStyle(fontSize: 14,fontFamily: "metropolis",color: Colors.grey),
             ),

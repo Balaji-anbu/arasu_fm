@@ -33,15 +33,15 @@ final PageController _pageController = PageController();
   @override
   void initState() {
     super.initState();
-    _simulateLoading(); // Simulate loading for 2 seconds
+    _simulateLoading();
   }
 
   Future<void> _simulateLoading() async {
-    await Future.delayed(const Duration(seconds: 3)); // Show shimmer for 2 seconds
+    await Future.delayed(const Duration(milliseconds: 00)); 
     
     await Future.wait([_fetchAudioData(), loadSliderImages(), fetchFeaturedPodcasts()]); // Load data
     setState(() {
-      _isLoading = false; // Stop shimmer after data is loaded
+      _isLoading = false; 
     });
   }
 
@@ -203,9 +203,9 @@ final PageController _pageController = PageController();
         ),
       ),
       const SizedBox(width: 4), // Add spacing between logo and text
-      Column(
+      const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           Text(
             'Arasu FM 90.4 MHz',
             style: TextStyle(
@@ -234,7 +234,7 @@ final PageController _pageController = PageController();
             onTap: () => _showTutorialPopup(animationKey),
             child: Lottie.asset("assets/tab.json"),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 2),
         ]
       : [],
 ),
@@ -278,9 +278,9 @@ CarouselSlider(
               imageUrl: imageUrl,
               fit: BoxFit.cover,
               placeholder: (context, url) => Center(
-                child: CircularProgressIndicator(),
+                child: Lottie.asset("assets/loading.json",height: 250,width: 250),
               ),
-              errorWidget: (context, url, error) => Center(
+              errorWidget: (context, url, error) => const Center(
                 child: Icon(Icons.error, color: Colors.red),
               ),
             ),
@@ -301,9 +301,9 @@ CarouselSlider(
               ],
             ),
             const SizedBox(height: 10),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: const [
+              children: [
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10.0),
                   child: Text(
@@ -346,15 +346,29 @@ CarouselSlider(
                           .map((audio) => GestureDetector(
                                 onTap: () {
                                   audioProvider.playAudio(audio);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => AudioPlayerPage(
-                                        audioUrl: audio.audioUrl,
-                                        audioData: audio,
-                                      ),
-                                    ),
-                                  );
+                                 Navigator.push(
+  context,
+  PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => AudioPlayerPage(
+      audioUrl: audio.audioUrl,
+      audioData: audio,
+    ),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(0.0, 1.0); // Start from bottom
+      const end = Offset.zero; // End at the current position
+      const curve = Curves.easeInOut;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      var offsetAnimation = animation.drive(tween);
+
+      return SlideTransition(
+        position: offsetAnimation,
+        child: child,
+      );
+    },
+  ),
+);
+
                                 },
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -398,11 +412,11 @@ CarouselSlider(
                           .toList(),
                     ),
                   ),
-                  SizedBox(height: 30,),
+                  const SizedBox(height: 30,),
                   
-                  Row(
+                  const Row(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: const [
+              children: [
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10.0),
                   child: Text(
@@ -417,7 +431,7 @@ CarouselSlider(
                 ),
               ],
             ),
-            SizedBox(height: 12,),
+            const SizedBox(height: 12,),
            
 _isLoading
     ? Shimmer.fromColors(
@@ -455,15 +469,29 @@ _isLoading
                 return GestureDetector(
                   onTap: () {
                     audioProvider.playAudio(audio);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AudioPlayerPage(
-                          audioUrl: audio.audioUrl,
-                          audioData: audio,
-                        ),
-                      ),
-                    );
+                   Navigator.push(
+  context,
+  PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => AudioPlayerPage(
+      audioUrl: audio.audioUrl,
+      audioData: audio,
+    ),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(0.0, 1.0); // Start from bottom
+      const end = Offset.zero; // End at the current position
+      const curve = Curves.easeInOut;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      var offsetAnimation = animation.drive(tween);
+
+      return SlideTransition(
+        position: offsetAnimation,
+        child: child,
+      );
+    },
+  ),
+);
+
                   },
                   child: Card(
                     margin: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -523,9 +551,9 @@ _isLoading
 
 
             const SizedBox(height: 30),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: const [
+              children: [
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10.0),
                   child: Text(
@@ -540,7 +568,7 @@ _isLoading
                 ),
               ],
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             _isLoading
                 ? Shimmer.fromColors(
                     baseColor: Colors.grey[700]!,
@@ -603,15 +631,29 @@ _isLoading
               ),
               onPressed: () {
                 audioProvider.playAudio(audio);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AudioPlayerPage(
-                      audioUrl: audio.audioUrl,
-                      audioData: audio,
-                    ),
-                  ),
-                );
+             Navigator.push(
+  context,
+  PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => AudioPlayerPage(
+      audioUrl: audio.audioUrl,
+      audioData: audio,
+    ),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(0.0, 1.0); // Start from bottom
+      const end = Offset.zero; // End at the current position
+      const curve = Curves.easeInOut;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      var offsetAnimation = animation.drive(tween);
+
+      return SlideTransition(
+        position: offsetAnimation,
+        child: child,
+      );
+    },
+  ),
+);
+
               },
             ),
           ),
@@ -619,9 +661,9 @@ _isLoading
       },
     ),
     const SizedBox(height: 30),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: const [
+              children: [
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10.0),
                   child: Text(
@@ -636,7 +678,7 @@ _isLoading
                 ),
               ],
             ),
-SizedBox(height: 12,),
+const SizedBox(height: 12,),
     // GridView for the remaining audios
     if (_audioList.length > 12)
       Padding(
@@ -656,15 +698,29 @@ SizedBox(height: 12,),
             return GestureDetector(
               onTap: () {
                 audioProvider.playAudio(audio);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AudioPlayerPage(
-                      audioUrl: audio.audioUrl,
-                      audioData: audio,
-                    ),
-                  ),
-                );
+             Navigator.push(
+  context,
+  PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => AudioPlayerPage(
+      audioUrl: audio.audioUrl,
+      audioData: audio,
+    ),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(0.0, 1.0); // Start from bottom
+      const end = Offset.zero; // End at the current position
+      const curve = Curves.easeInOut;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      var offsetAnimation = animation.drive(tween);
+
+      return SlideTransition(
+        position: offsetAnimation,
+        child: child,
+      );
+    },
+  ),
+);
+
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -710,12 +766,12 @@ SizedBox(height: 12,),
       ),
   ],
 ),
- SizedBox(height: 50),
-Text("Ohh! You Reached End",style: TextStyle(color: Colors.white,fontFamily: "metropolis",fontSize: 16),),
-Text("Go To Video Section To Explore More!",style: TextStyle(color: Colors.white,fontFamily: "metropolis",fontSize: 16),),
+ const SizedBox(height: 50),
+const Text("Ohh! You Reached End",style: TextStyle(color: Colors.white,fontFamily: "metropolis",fontSize: 16),),
+const Text("Go To Video Section To Explore More!",style: TextStyle(color: Colors.white,fontFamily: "metropolis",fontSize: 16),),
 
 
-            SizedBox(height: 150),
+            const SizedBox(height: 150),
           ],
         ),
       ),

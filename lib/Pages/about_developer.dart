@@ -42,7 +42,7 @@ class AboutDeveloperPage extends StatelessWidget {
           // Background Image as Scaffold background
           Positioned.fill(
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage('assets/back.jpg'), // Your background image here
                   fit: BoxFit.cover, // Ensures the image covers the entire screen
@@ -67,7 +67,7 @@ class AboutDeveloperPage extends StatelessWidget {
                   child: Column( mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      SizedBox(height: 100),
+                      const SizedBox(height: 100),
                       Text(
                         'Balaji A',
                         style: GoogleFonts.poppins(
@@ -76,7 +76,7 @@ class AboutDeveloperPage extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 2),
+                      const SizedBox(height: 2),
                       Text(
                         'Flutter Developer',
                         style: GoogleFonts.poppins(
@@ -85,7 +85,7 @@ class AboutDeveloperPage extends StatelessWidget {
                           color: Colors.grey[600],
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       Text(
                         'Final Year CSE Department',
                         style: GoogleFonts.poppins(
@@ -102,7 +102,7 @@ class AboutDeveloperPage extends StatelessWidget {
                           color: Colors.grey[400],
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       Text(
                         'Passionate about creating seamless, user-friendly mobile applications with modern UI/UX and efficient architecture.',
                         style: GoogleFonts.poppins(
@@ -117,13 +117,13 @@ class AboutDeveloperPage extends StatelessWidget {
                 ),
               ),
               // Spacer to push "Get In Touch" to the bottom
-              Spacer(),
+              const Spacer(),
               // Bottom content
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    Text(
+                    const Text(
                       'Get In Touch ',
                       style: TextStyle(
                         color: Colors.white,
@@ -171,8 +171,8 @@ class AboutDeveloperPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(height: 12,),
-                    Text("NightSpace Technologies",style: TextStyle(color: Colors.grey,fontFamily: "metropolis",))
+                    const SizedBox(height: 12,),
+                    const Text("NightSpace Technologies",style: TextStyle(color: Colors.grey,fontFamily: "metropolis",))
                   ],
                 ),
               ),

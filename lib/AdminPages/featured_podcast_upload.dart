@@ -130,7 +130,7 @@ class _PodcastAdminPageState extends State<PodcastAdminPage> {
         _isUploading = true;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Uploading podcast, please wait...'),
         backgroundColor: Colors.orange,
       ));
@@ -149,7 +149,7 @@ class _PodcastAdminPageState extends State<PodcastAdminPage> {
           audioResult['id']!,
         );
 
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Podcast uploaded successfully!'),
           backgroundColor: Colors.green,
         ));
@@ -167,7 +167,7 @@ class _PodcastAdminPageState extends State<PodcastAdminPage> {
         });
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Please complete the form'),
         backgroundColor: Colors.red,
       ));
@@ -179,7 +179,7 @@ class _PodcastAdminPageState extends State<PodcastAdminPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar:AppBar(
-          title: Text(
+          title: const Text(
             'Upload Featured',
             style: TextStyle(
               fontFamily: 'metropolis',
@@ -192,15 +192,15 @@ class _PodcastAdminPageState extends State<PodcastAdminPage> {
            Padding(
   padding: const EdgeInsets.all(8.0),
   child: IconButton(
-    icon: Icon(Icons.info, size: 30, color: Colors.black),
+    icon: const Icon(Icons.info, size: 30, color: Colors.black),
     onPressed: () {
       // Show the bottom sheet when the icon is tapped
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,  // Allow bottom sheet to grow in height
         builder: (BuildContext context) {
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
+          return const Padding(
+            padding: EdgeInsets.all(16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,8 +252,8 @@ class _PodcastAdminPageState extends State<PodcastAdminPage> {
                 children: [
                   ElevatedButton.icon(
                     onPressed: _pickImageFile,
-                    icon: Icon(Icons.image),
-                    label: Text('Pick Image',
+                    icon: const Icon(Icons.image),
+                    label: const Text('Pick Image',
                         style: TextStyle(fontFamily: 'metropolis')),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.teal,
@@ -261,8 +261,8 @@ class _PodcastAdminPageState extends State<PodcastAdminPage> {
                   ),
                   ElevatedButton.icon(
                     onPressed: _pickAudioFile,
-                    icon: Icon(Icons.audiotrack),
-                    label: Text('Pick Audio',
+                    icon: const Icon(Icons.audiotrack),
+                    label: const Text('Pick Audio',
                         style: TextStyle(fontFamily: 'metropolis')),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.teal,
@@ -277,9 +277,9 @@ class _PodcastAdminPageState extends State<PodcastAdminPage> {
                   child: Column(
                     children: [
                       Image.file(_podcastImageFile!, height: 100, fit: BoxFit.cover),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text('Image: ${_podcastImageFile!.path.split('/').last}',
-                          style: TextStyle(fontSize: 16, color: Colors.black)),
+                          style: const TextStyle(fontSize: 16, color: Colors.black)),
                     ],
                   ),
                 ),
@@ -287,20 +287,20 @@ class _PodcastAdminPageState extends State<PodcastAdminPage> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text('Audio: ${_podcastAudioFile!.path.split('/').last}',
-                      style: TextStyle(fontSize: 16, color: Colors.black)),
+                      style: const TextStyle(fontSize: 16, color: Colors.black)),
                 ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               // InkWell for Upload button
               InkWell(
                 onTap: _uploadPodcast,
                 borderRadius: BorderRadius.circular(12),
                 child: Ink(
-                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   decoration: BoxDecoration(
                     color: Colors.teal,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Center(
+                  child: const Center(
                     child: Text(
                       'Upload',
                       style: TextStyle(fontFamily: 'metropolis', color: Colors.white),
@@ -308,7 +308,7 @@ class _PodcastAdminPageState extends State<PodcastAdminPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               // StreamBuilder for Podcast List
               Expanded(
                 child: StreamBuilder<QuerySnapshot>(
@@ -318,11 +318,11 @@ class _PodcastAdminPageState extends State<PodcastAdminPage> {
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator());
                     }
 
                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return Center(child: Text('No Uploads available.'));
+                      return const Center(child: Text('No Uploads available.'));
                     }
 
                     final podcasts = snapshot.data!.docs;
@@ -337,32 +337,32 @@ class _PodcastAdminPageState extends State<PodcastAdminPage> {
                         final audioId = podcast['audioId'];
 
                         return ListTile(
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                          title: Text(title, style: TextStyle(fontSize: 18)),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          title: Text(title, style: const TextStyle(fontSize: 18)),
                           leading: Image.network(imageUrl, width: 50, height: 50, fit: BoxFit.cover),
                           subtitle: Text(audioUrl),
                           trailing: IconButton(
-                            icon: Icon(Icons.delete, color: Colors.red),
+                            icon: const Icon(Icons.delete, color: Colors.red),
                             onPressed: () async {
                               // Show confirmation dialog before deleting
                               final confirmed = await showDialog<bool>(
                                 context: context,
                                 builder: (context) {
                                   return AlertDialog(
-                                    title: Text('Delete Podcast'),
-                                    content: Text('Are you sure you want to delete this podcast?'),
+                                    title: const Text('Delete Podcast'),
+                                    content: const Text('Are you sure you want to delete this podcast?'),
                                     actions: [
                                       TextButton(
                                         onPressed: () {
                                           Navigator.of(context).pop(false);
                                         },
-                                        child: Text('Cancel'),
+                                        child: const Text('Cancel'),
                                       ),
                                       TextButton(
                                         onPressed: () {
                                           Navigator.of(context).pop(true);
                                         },
-                                        child: Text('Delete', style: TextStyle(color: Colors.red)),
+                                        child: const Text('Delete', style: TextStyle(color: Colors.red)),
                                       ),
                                     ],
                                   );
@@ -371,7 +371,7 @@ class _PodcastAdminPageState extends State<PodcastAdminPage> {
 
                               if (confirmed == true) {
                                 await deletePodcast(imageId, audioId);
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                   content: Text('Media deleted successfully!'),
                                   backgroundColor: Colors.green,
                                 ));

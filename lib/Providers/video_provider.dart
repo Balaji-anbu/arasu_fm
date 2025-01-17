@@ -25,7 +25,6 @@ class VideoProvider with ChangeNotifier {
   String get currentApiKey => apiKeys[_currentKeyIndex];
 void _switchApiKey() {
 _currentKeyIndex = (_currentKeyIndex + Random().nextInt(apiKeys.length)) % apiKeys.length;
-  print('Switching to API key: ${apiKeys[_currentKeyIndex]}');
   notifyListeners();
 }
 
@@ -43,19 +42,19 @@ Future<void> fetchVideos({bool loadMore = false}) async {
     'https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=$channelId&maxResults=5&pageToken=${_nextPageToken ?? ''}&key=$currentApiKey',
   );
 
-  print('Fetching videos with URL: $url');  // Log the URL
+  // Log the URL
 
   try {
     final response = await http.get(url);
 
-    print('Response Status Code: ${response.statusCode}');  // Log the status code
-    print('Response Body: ${response.body}');  // Log the response body for debugging
+    // Log the status code
+    // Log the response body for debugging
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
 
       if (data['items'] == null) {
-        print('No items found in the response'); // Log if no items were returned
+        // Log if no items were returned
         return;
       }
 
@@ -76,17 +75,14 @@ Future<void> fetchVideos({bool loadMore = false}) async {
       }
 
       _nextPageToken = data['nextPageToken'];
-      print('Videos fetched successfully: ${_videos.length} videos loaded.');
     } else if (response.statusCode == 403) {
-      print('API Key Rate Limit Reached, switching key...');
       _switchApiKey();
       await fetchVideos(loadMore: loadMore);
     } else {
-      print('Error fetching videos: ${response.statusCode}');  // Log error status
+      // Log error status
       throw Exception('Failed to fetch videos: ${response.statusCode}');
     }
   } catch (e) {
-    print('Error fetching videos: $e');
     _loadFallbackVideos();
   } finally {
     if (loadMore) {
@@ -111,16 +107,13 @@ Future<void> fetchVideos({bool loadMore = false}) async {
         final subscriberCount =
             data['items'][0]['statistics']['subscriberCount'];
         _subscriberCount = int.parse(subscriberCount);
-        print('Subscriber count fetched: $_subscriberCount');
       } else if (response.statusCode == 403) {
-        print('API Key Rate Limit Reached, switching key...');
         _switchApiKey();
         await fetchSubscriberCount();
       } else {
         throw Exception('Failed to fetch subscriber count');
       }
     } catch (e) {
-      print('Error fetching subscriber count: $e');
     } finally {
       _isLoadingSubscriberCount = false;
       notifyListeners();

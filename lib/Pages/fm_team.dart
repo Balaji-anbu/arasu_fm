@@ -72,21 +72,21 @@ class TeamMembersPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              const Color(0xff213555),
-              const Color.fromARGB(255, 2, 15, 27),
+              Color(0xff213555),
+              Color.fromARGB(255, 2, 15, 27),
             ],
           ),
         ),
         child: Column(
           children: [
             AppBar(
-              iconTheme: IconThemeData(color: Colors.white),
-              title: Text(
+              iconTheme: const IconThemeData(color: Colors.white),
+              title: const Text(
                 ' Our Team Members',
                 style: TextStyle(
                     color: Colors.white,
@@ -101,7 +101,7 @@ class TeamMembersPage extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 1,
                     crossAxisSpacing: 16.0,
                     mainAxisSpacing: 16.0,
@@ -145,7 +145,7 @@ class TeamMemberCard extends StatelessWidget {
       elevation: 5,
       child: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
@@ -162,10 +162,10 @@ class TeamMemberCard extends StatelessWidget {
               radius: 100.0,
               backgroundImage: AssetImage(image),
             ),
-            SizedBox(height: 8.0),
+            const SizedBox(height: 8.0),
             Text(
               name,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'metropolis',
@@ -173,7 +173,7 @@ class TeamMemberCard extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 4.0),
+            const SizedBox(height: 4.0),
             Text(
               position,
               style: TextStyle(

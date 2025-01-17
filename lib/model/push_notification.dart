@@ -31,8 +31,7 @@ Future<void> sendPushNotification({
   );
 
   if (response.statusCode == 200) {
-    print("Notification sent successfully: ${response.body}");
   } else {
-    print("Failed to send notification: ${response.body}");
   }
 }
+

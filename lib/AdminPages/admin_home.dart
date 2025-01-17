@@ -31,9 +31,8 @@ Future<void> signOut(BuildContext context) async {
       (route) => false,
     );
   } catch (e) {
-    print('Error signing out: $e');
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Failed to sign out. Please try again.')),
+      const SnackBar(content: Text('Failed to sign out. Please try again.')),
     );
   }
 }
@@ -79,7 +78,6 @@ Future<void> signOut(BuildContext context) async {
 
               // Proceed with logout if confirmed
               if (shouldLogout ?? false) {
-                print("User logged out");
                 await signOut(context); // Call the logout method with context
               }
             },
@@ -93,7 +91,7 @@ Future<void> signOut(BuildContext context) async {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Welcome to the Admin Panel',
               style: TextStyle(
                 fontSize: 24,
@@ -104,7 +102,7 @@ Future<void> signOut(BuildContext context) async {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
-            Text("Upload Main Stream Podcasts",style: TextStyle(
+            const Text("Upload Main Stream Podcasts",style: TextStyle(
                 fontSize: 22,
                 fontFamily: 'metropolis',
                 fontWeight: FontWeight.bold,
@@ -126,7 +124,7 @@ Future<void> signOut(BuildContext context) async {
                   color: Colors.teal,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(
+                child: const Text(
                   'Upload Podcasts',
                   style: TextStyle(
                     fontSize: 18,
@@ -138,9 +136,9 @@ Future<void> signOut(BuildContext context) async {
               ),
             ),
              const SizedBox(height: 24),
-            Divider(thickness: 1,),
+            const Divider(thickness: 1,),
              const SizedBox(height: 24),
-            Text("Upload Featured Podcasts and Theme Audios ",style: TextStyle(
+            const Text("Upload Featured Podcasts and Theme Audios ",style: TextStyle(
                 fontSize: 22,
                 fontFamily: 'metropolis',
                 fontWeight: FontWeight.bold,
@@ -162,7 +160,7 @@ Future<void> signOut(BuildContext context) async {
                   color: Colors.teal,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(
+                child: const Text(
                   'Featured Tab',
                   style: TextStyle(
                     fontSize: 18,
@@ -174,9 +172,9 @@ Future<void> signOut(BuildContext context) async {
               ),
             ),
             const SizedBox(height: 24),
-            Divider(thickness: 1,),
+            const Divider(thickness: 1,),
              const SizedBox(height: 24),
-            Text("Upload sliders or New updates and posters ",style: TextStyle(
+            const Text("Upload sliders or New updates and posters ",style: TextStyle(
                 fontSize: 22,
                 fontFamily: 'metropolis',
                 fontWeight: FontWeight.bold,

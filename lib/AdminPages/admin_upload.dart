@@ -118,7 +118,7 @@ class _UploadPageState extends State<UploadPage> {
         _isUploading = true;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Uploading files, please wait...'),
         backgroundColor: Colors.orange,
       ));
@@ -137,7 +137,7 @@ class _UploadPageState extends State<UploadPage> {
           audioResult['id']!,
         );
 
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Files uploaded successfully!'),
           backgroundColor: Colors.green,
         ));
@@ -155,7 +155,7 @@ class _UploadPageState extends State<UploadPage> {
         });
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Please complete the form'),
         backgroundColor: Colors.red,
       ));
@@ -168,20 +168,20 @@ class _UploadPageState extends State<UploadPage> {
     bool shouldDelete = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete Media Entry'),
+        title: const Text('Delete Media Entry'),
         content: Text('Are you sure you want to delete "${document['title']}"?'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop(false);
             },
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop(true);
             },
-            child: Text('Delete'),
+            child: const Text('Delete'),
           ),
         ],
       ),
@@ -199,7 +199,7 @@ class _UploadPageState extends State<UploadPage> {
         // Delete Firestore document
         await document.reference.delete();
 
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Media entry deleted successfully!'),
           backgroundColor: Colors.orange,
         ));
@@ -221,13 +221,13 @@ class _UploadPageState extends State<UploadPage> {
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         final documents = snapshot.data!.docs;
 
         if (documents.isEmpty) {
-          return Center(
+          return const Center(
             child: Text(
               'No media items found',
               style: TextStyle(fontSize: 16, color: Colors.grey),
@@ -250,7 +250,7 @@ class _UploadPageState extends State<UploadPage> {
                 contentPadding: const EdgeInsets.all(16),
                 title: Text(
                   document['title'],
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.teal,
@@ -259,11 +259,11 @@ class _UploadPageState extends State<UploadPage> {
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(Icons.image, size: 20, color: Colors.blueGrey),
-                        SizedBox(width: 8),
+                        const Icon(Icons.image, size: 20, color: Colors.blueGrey),
+                        const SizedBox(width: 8),
                         Flexible(
                           child: Text(
                             document['imageUrl'],
@@ -274,12 +274,12 @@ class _UploadPageState extends State<UploadPage> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(Icons.audiotrack,
+                        const Icon(Icons.audiotrack,
                             size: 20, color: Colors.blueGrey),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Flexible(
                           child: Text(
                             document['audioUrl'],
@@ -290,7 +290,7 @@ class _UploadPageState extends State<UploadPage> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     // Display the image thumbnail
                     Image.network(
                       document['imageUrl'],
@@ -309,7 +309,7 @@ class _UploadPageState extends State<UploadPage> {
                       shape: BoxShape.circle,
                     ),
                     padding: const EdgeInsets.all(8),
-                    child: Icon(
+                    child: const Icon(
                       Icons.delete,
                       size: 24,
                       color: Colors.red,
@@ -328,7 +328,7 @@ class _UploadPageState extends State<UploadPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text(
+          title: const Text(
             'Upload Podcasts',
             style: TextStyle(
               fontFamily: 'metropolis',
@@ -341,15 +341,15 @@ class _UploadPageState extends State<UploadPage> {
            Padding(
   padding: const EdgeInsets.all(8.0),
   child: IconButton(
-    icon: Icon(Icons.info, size: 30, color: Colors.black),
+    icon: const Icon(Icons.info, size: 30, color: Colors.black),
     onPressed: () {
       // Show the bottom sheet when the icon is tapped
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,  // Allow bottom sheet to grow in height
         builder: (BuildContext context) {
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
+          return const Padding(
+            padding: EdgeInsets.all(16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -413,11 +413,11 @@ class _UploadPageState extends State<UploadPage> {
                         color: Colors.teal,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                         vertical: 12,
                         horizontal: 24,
                       ),
-                      child: Row(
+                      child: const Row(
                         children: [
                           Icon(Icons.image, color: Colors.white),
                           SizedBox(width: 8),
@@ -437,11 +437,11 @@ class _UploadPageState extends State<UploadPage> {
                         color: Colors.teal,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                         vertical: 12,
                         horizontal: 24,
                       ),
-                      child: Row(
+                      child: const Row(
                         children: [
                           Icon(Icons.audiotrack, color: Colors.white),
                           SizedBox(width: 8),
@@ -455,7 +455,7 @@ class _UploadPageState extends State<UploadPage> {
                   ),
                 ],
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               if (_imageFile != null)
                 Column(
                   children: [
@@ -468,7 +468,7 @@ class _UploadPageState extends State<UploadPage> {
                         fit: BoxFit.contain,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
@@ -481,7 +481,7 @@ class _UploadPageState extends State<UploadPage> {
               if (_audioFile != null)
                 Column(
                   children: [
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
@@ -491,7 +491,7 @@ class _UploadPageState extends State<UploadPage> {
                     ),
                   ],
                 ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               InkWell(
                 onTap: _uploadFiles,
                 borderRadius: BorderRadius.circular(12),
@@ -500,11 +500,11 @@ class _UploadPageState extends State<UploadPage> {
                     color: Colors.teal,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  padding: EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                     vertical: 16,
                     horizontal: 48,
                   ),
-                  child: Text(
+                  child: const Text(
                     'Upload',
                     style: TextStyle(
                       fontSize: 18,
@@ -529,8 +529,8 @@ class _UploadPageState extends State<UploadPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Lottie.asset('assets/uploading.json', width: 150),
-                    SizedBox(height: 20),
-                    Text(
+                    const SizedBox(height: 20),
+                    const Text(
                       'Uploading...',
                       style: TextStyle(
                         fontFamily: 'metropolis',

@@ -2,6 +2,7 @@ import 'package:arasu_fm/controllers/audio_control_button.dart';
 import 'package:arasu_fm/model/share_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:arasu_fm/Pages/audio_data.dart';
 import 'package:arasu_fm/Providers/audio_provider.dart';
@@ -56,8 +57,8 @@ ClipRRect(
     height: screenHeight * 0.35,
     width: screenWidth * 0.7,
     fit: BoxFit.cover,
-    placeholder: (context, url) => const Center(
-      child: CircularProgressIndicator(),
+    placeholder: (context, url) =>  Center(
+      child: Lottie.asset("assets/loading.json",height: 250,width: 250),
     ),
     errorWidget: (context, url, error) => const Icon(Icons.error),
   ),

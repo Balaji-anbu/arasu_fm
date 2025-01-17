@@ -100,7 +100,7 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
         _isUploading = true;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Uploading slider image, please wait...'),
         backgroundColor: Colors.orange,
       ));
@@ -115,7 +115,7 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
           imageResult['id']!,
         );
 
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Slider image uploaded successfully!'),
           backgroundColor: Colors.green,
         ));
@@ -132,7 +132,7 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
         });
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Please complete the form'),
         backgroundColor: Colors.red,
       ));
@@ -146,12 +146,12 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Confirm Delete'),
+          title: const Text('Confirm Delete'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Are you sure you want to delete this image?'),
-              SizedBox(height: 10),
+              const Text('Are you sure you want to delete this image?'),
+              const SizedBox(height: 10),
               Image.network(
                 document['imageUrl'],
                 width: 100,
@@ -163,11 +163,11 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text('Delete'),
+              child: const Text('Delete'),
             ),
           ],
         );
@@ -185,7 +185,7 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
         // Delete Firestore document
         await document.reference.delete();
 
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Slider image deleted successfully!'),
           backgroundColor: Colors.orange,
         ));
@@ -207,13 +207,13 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         final documents = snapshot.data!.docs;
 
         if (documents.isEmpty) {
-          return Center(
+          return const Center(
             child: Text(
               'No slider images found',
               style: TextStyle(fontSize: 16, color: Colors.grey),
@@ -237,7 +237,7 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
                
                 title: Text(
                   document['title'],
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.teal,
@@ -248,8 +248,8 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.image, size: 20, color: Colors.blueGrey),
-                        SizedBox(width: 8),
+                        const Icon(Icons.image, size: 20, color: Colors.blueGrey),
+                        const SizedBox(width: 8),
                         Flexible(
                           child: Text(
                             document['imageUrl'],
@@ -259,7 +259,7 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Image.network(
                       document['imageUrl'],
                       width: 280,
@@ -277,7 +277,7 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
                       shape: BoxShape.circle,
                     ),
                     padding: const EdgeInsets.all(8),
-                    child: Icon(
+                    child: const Icon(
                       Icons.delete,
                       size: 24,
                       color: Colors.red,
@@ -296,7 +296,7 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar:AppBar(
-          title: Text(
+          title: const Text(
             'Upload Sliders',
             style: TextStyle(
               fontFamily: 'metropolis',
@@ -309,15 +309,15 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
            Padding(
   padding: const EdgeInsets.all(8.0),
   child: IconButton(
-    icon: Icon(Icons.info, size: 30, color: Colors.black),
+    icon: const Icon(Icons.info, size: 30, color: Colors.black),
     onPressed: () {
       // Show the bottom sheet when the icon is tapped
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,  // Allow bottom sheet to grow in height
         builder: (BuildContext context) {
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
+          return const Padding(
+            padding: EdgeInsets.all(16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -374,7 +374,7 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  child: Row(
+                  child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.image, color: Colors.white),
@@ -384,7 +384,7 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               if (_sliderImageFile != null)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -397,12 +397,12 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
                 ),
               ElevatedButton(
                 onPressed: _uploadSliderImage,
-                child: Text(
+                child: const Text(
                   'Upload',
                   style: TextStyle(fontFamily: 'metropolis' ,color: Colors.white,fontWeight: FontWeight.bold,fontSize: 16),
                 ),
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   backgroundColor: Colors.teal,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -424,8 +424,8 @@ class _SliderImageUploadPageState extends State<SliderImageUploadPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Lottie.asset('assets/uploading.json', width: 150),
-                    SizedBox(height: 20),
-                    Text(
+                    const SizedBox(height: 20),
+                    const Text(
                       'Uploading...',
                       style: TextStyle(
                         fontFamily: 'metropolis',

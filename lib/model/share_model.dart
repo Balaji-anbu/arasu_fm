@@ -18,16 +18,13 @@ class ShareAppButton extends StatelessWidget {
         return snapshot['link'] ??
             'https://default-app-link.com'; // Default link if not available
       } else {
-        print('Firestore document not found. Returning default link.');
         return 'https://default-app-link.com'; // Default link if document doesn't exist
       }
     } on FirebaseException catch (e) {
       // Specific Firebase exception handling
-      print('Error fetching app download link from Firestore: ${e.message}');
       return 'https://default-app-link.com'; // Default link on Firebase error
     } catch (e) {
       // General error handling
-      print('Unknown error while fetching app download link: $e');
       return 'https://default-app-link.com'; // Default link on unknown error
     }
   }
@@ -42,17 +39,15 @@ class ShareAppButton extends StatelessWidget {
       // Attempt to share the link
       await Share.share(shareMessage,
           subject: "Download Arasu FM 90.4MHz podcast app!");
-      print('App link shared successfully!');
     } catch (e) {
       // Catch errors that occur during sharing
-      print('Error sharing app: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: Icon(
+      icon: const Icon(
         Icons.share,
         size: 30,
         color: Colors.white,
@@ -60,7 +55,6 @@ class ShareAppButton extends StatelessWidget {
       iconSize: 40,
       onPressed: () async {
         // Trigger sharing when pressed
-        print('Share button pressed!');
         await shareApp();
       },
     );

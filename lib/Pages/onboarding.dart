@@ -99,7 +99,7 @@ class Onboarding extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => EmailPassword()));
+                              builder: (context) => const EmailPassword()));
                     },
                     splashColor: Colors.black26,
                     child: Padding(
@@ -117,9 +117,9 @@ class Onboarding extends StatelessWidget {
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.email),
+                            const Icon(Icons.email),
                             SizedBox(width: screenWidth * 0.02),
-                            Text(
+                            const Text(
                               'Continue With Email',
                               style: TextStyle(
                                   color: Colors.black,
@@ -200,7 +200,7 @@ class Onboarding extends StatelessWidget {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => LoginPage()));
+                                  builder: (context) => const LoginPage()));
                         },
                         child: const Text(
                           'Login',
