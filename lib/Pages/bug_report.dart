@@ -26,8 +26,7 @@ class _BugReportingPageState extends State<BugReportingPage> {
         await FirebaseFirestore.instance.collection('Bugreports').add({
           'title': _titleController.text,
           'description': _descriptionController.text,
-          'email':
-              _emailController.text.isNotEmpty ? _emailController.text : null,
+          'email': _emailController.text.isNotEmpty ? _emailController.text : null,
           'timestamp': FieldValue.serverTimestamp(),
         });
         ScaffoldMessenger.of(context).showSnackBar(
@@ -55,128 +54,96 @@ class _BugReportingPageState extends State<BugReportingPage> {
         title: const Text(
           'Report Bug',
           style: TextStyle(
-              color: Colors.white,
-              fontFamily: 'metropolis',
-              fontWeight: FontWeight.bold),
+            color: Colors.white,
+            fontFamily: 'metropolis',
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        // ignore: prefer_const_literals_to_create_immutables
-        actions: [
-           const Icon(
+        actions: const [
+          Icon(
             Icons.bug_report,
             color: Colors.teal,
             size: 34,
           ),
-          const SizedBox(
-            width: 20,
-          )
+          SizedBox(width: 20),
         ],
       ),
-      body: Container(
-        color: const Color.fromARGB(255, 2, 15, 27), // Dark background
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildSectionCard(
-                title: 'We value your feedback!',
-                content:
-                    'If you encounter any issues, please let us know so we can improve your experience.',
-              ),
-              _buildSectionCard(
-                title: 'Bug Title',
-                child: TextFormField(
-                  controller: _titleController,
-                  decoration: InputDecoration(
-                    hintText: 'Enter the title of the bug',
-                    hintStyle: const TextStyle(fontFamily: 'metropolis'),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildSectionCard(
+              title: 'We value your feedback!',
+              content: 'If you encounter any issues, please let us know so we can improve your experience.',
+            ),
+            _buildTextFieldCard(
+              title: 'Bug Title',
+              controller: _titleController,
+              hint: 'Enter the title of the bug',
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a title for the bug.';
+                }
+                return null;
+              },
+            ),
+            _buildTextFieldCard(
+              title: 'Bug Description',
+              controller: _descriptionController,
+              hint: 'Describe the bug in detail',
+              maxLines: 6,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please describe the bug.';
+                }
+                return null;
+              },
+            ),
+            _buildTextFieldCard(
+              title: 'Your Email (optional)',
+              controller: _emailController,
+              hint: 'Enter your email (optional)',
+              validator: (value) {
+                if (value != null &&
+                    value.isNotEmpty &&
+                    !RegExp(r"^[^@\s]+@[^@\s]+\.[^@\s]+\$").hasMatch(value)) {
+                  return 'Please enter a valid email address.';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 20),
+            Center(
+              child: ElevatedButton(
+                onPressed: _submitBugReport,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  backgroundColor: Colors.greenAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a title for the bug.';
-                    }
-                    return null;
-                  },
+                ),
+                child: const Text(
+                  'Submit Bug Report',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'metropolis',
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              _buildSectionCard(
-                title: 'Bug Description',
-                child: TextFormField(
-                  controller: _descriptionController,
-                  maxLines: 6,
-                  decoration: InputDecoration(
-                    hintText: 'Describe the bug in detail',
-                    hintStyle: const TextStyle(fontFamily: 'metropolis'),
-                    alignLabelWithHint: true,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please describe the bug.';
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              _buildSectionCard(
-                title: 'Your Email (optional)',
-                child: TextFormField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    hintText: 'Enter your email (optional)',
-                    hintStyle: const TextStyle(fontFamily: 'metropolis'),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value != null &&
-                        value.isNotEmpty &&
-                        !RegExp(r"^[^@\s]+@[^@\s]+\.[^@\s]+\$")
-                            .hasMatch(value)) {
-                      return 'Please enter a valid email address.';
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Center(
-                child: ElevatedButton(
-                  onPressed: _submitBugReport,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                    backgroundColor: Colors.greenAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
-                  child: const Text('Submit Bug Report',
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'metropolis',
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold)),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildSectionCard(
-      {required String title, String? content, Widget? child}) {
+  Widget _buildSectionCard({required String title, String? content, Widget? child}) {
     return Card(
-      color: Colors.grey[900], // Light color card for contrast
+      color: Colors.grey[900],
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -210,6 +177,31 @@ class _BugReportingPageState extends State<BugReportingPage> {
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextFieldCard({
+    required String title,
+    required TextEditingController controller,
+    required String hint,
+    int? maxLines,
+    required String? Function(String?) validator,
+  }) {
+    return _buildSectionCard(
+      title: title,
+      child: TextFormField(
+        controller: controller,
+        maxLines: maxLines,
+        style: const TextStyle(color: Colors.greenAccent), // Green text color for input
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(fontFamily: 'metropolis', color: Colors.greenAccent),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+        ),
+        validator: validator,
       ),
     );
   }

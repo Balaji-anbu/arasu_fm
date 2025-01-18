@@ -20,7 +20,7 @@ class ShareAppButton extends StatelessWidget {
       } else {
         return 'https://default-app-link.com'; // Default link if document doesn't exist
       }
-    } on FirebaseException catch (e) {
+    } on FirebaseException {
       // Specific Firebase exception handling
       return 'https://default-app-link.com'; // Default link on Firebase error
     } catch (e) {

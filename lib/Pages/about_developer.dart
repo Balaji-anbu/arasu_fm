@@ -10,12 +10,16 @@ class AboutDeveloperPage extends StatelessWidget {
   final String githubUrl = 'https://github.com/Balaji-anbu';
   final String email = 'anbubalaji2112@gmail.com';
 
+  const AboutDeveloperPage({super.key});
+
   // Method to launch a URL
   Future<void> _launchUrl(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication, // or LaunchMode.inAppWebView
+    )) {
+      throw Exception('Could not launch $url');
     }
   }
 
@@ -53,7 +57,7 @@ class AboutDeveloperPage extends StatelessWidget {
           // Semi-transparent overlay for better contrast
           Positioned.fill(
             child: Container(
-              color: Colors.black.withOpacity(0.6), // Dark overlay for text contrast
+              color: Colors.black.withAlpha((0.6 * 255).round()), // Dark overlay for text contrast
             ),
           ),
           // Content

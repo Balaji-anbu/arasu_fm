@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:arasu_fm/AdminPages/admin_home.dart';
 import 'package:arasu_fm/Pages/home_page.dart';
 import 'package:arasu_fm/Pages/onboarding.dart';
@@ -7,15 +6,14 @@ import 'package:arasu_fm/Providers/audio_provider.dart';
 import 'package:arasu_fm/Providers/video_provider.dart';
 import 'package:arasu_fm/controllers/login_controller.dart';
 import 'package:arasu_fm/model/splash_screen_animation.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:lottie/lottie.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/services.dart';
 
 
 Future<void> main() async {
@@ -65,129 +63,127 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
-}class AuthWrapper extends StatefulWidget {
+}
+
+class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
 
   @override
   _AuthWrapperState createState() => _AuthWrapperState();
 }
-
 class _AuthWrapperState extends State<AuthWrapper> {
-  DateTime? lastPressedTime;
+  DateTime? lastPressedTime; // Track last back button press time
   bool isOffline = false;
   bool isInitializing = true;
-  late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
+  User? user;
+
+  late InternetConnectionChecker connectionChecker;
 
   @override
   void initState() {
     super.initState();
+    connectionChecker = InternetConnectionChecker.createInstance();
+
+    // Initial internet check only at startup
     _checkInternetConnection();
-    
-    // Add listener for connectivity changes
-    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) {
-      _updateConnectionStatus(results.first);
-    });
 
-    // Set initializing to false after initial auth check
-    FirebaseAuth.instance.authStateChanges().first.then((_) {
-      if (mounted) {
-        setState(() {
-          isInitializing = false;
-        });
-      }
-    });
+    // Handle Firebase auth state only once during startup
+    _initializeAuthState();
   }
 
-  @override
-  void dispose() {
-    _connectivitySubscription.cancel();
-    super.dispose();
-  }
-
-  // Method to check internet connection
+  // Method to check internet connection once during startup
   Future<void> _checkInternetConnection() async {
-    final results = await Connectivity().checkConnectivity();
-    _updateConnectionStatus(results.first);
+    bool isConnected = await connectionChecker.hasConnection;
+    _updateConnectionStatus(isConnected);
   }
 
   // Update connection status
-  void _updateConnectionStatus(ConnectivityResult result) {
+  void _updateConnectionStatus(bool isConnected) {
     setState(() {
-      isOffline = result == ConnectivityResult.none;
+      isOffline = !isConnected;
     });
+  }
+
+  // Method to handle Firebase auth state initialization
+  Future<void> _initializeAuthState() async {
+    try {
+      User? currentUser = FirebaseAuth.instance.currentUser;
+
+      // Set the user and stop initializing
+      setState(() {
+        user = currentUser;
+        isInitializing = false;
+      });
+    } catch (e) {
+      // Handle errors during auth state initialization
+      setState(() {
+        isInitializing = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Intercept the back button using WillPopScope
     return WillPopScope(
       onWillPop: () async {
+        // Handle double-tap or Snackbar for exit
         DateTime now = DateTime.now();
         if (lastPressedTime == null ||
-            now.difference(lastPressedTime!) > const Duration(seconds: 2)) {
+            now.difference(lastPressedTime!) > const Duration(seconds: 1)) {
           lastPressedTime = now;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Do That Again! To Exit.'),
-              backgroundColor: Colors.red,
-              duration: Duration(seconds: 2),
+            SnackBar(
+              content: const Text('Press back again to exit'),
+              duration: const Duration(seconds: 1),
+              behavior: SnackBarBehavior.floating,
             ),
           );
-          return false;
-        } else {
-          SystemNavigator.pop();
-          return true;
+          return false; // Prevent exiting the app
         }
+        return true; // Allow exiting the app
       },
-      child: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          // Check for offline state first
-          if (isOffline) {
-            return const NoInternetPage();
-          }
-
-          // Only show loading on initial app launch
-          if (isInitializing) {
-            return const Scaffold(
-              backgroundColor: Color.fromARGB(255, 2, 15, 27),
-              body: Center(
-                child: Text(
-                  'Loading...',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontFamily: "metropolis",
-                  ),
-                ),
-              ),
-            );
-          }
-
-          // For subsequent auth state changes, maintain current UI
-          if (snapshot.connectionState == ConnectionState.active) {
-            if (snapshot.hasData) {
-              final user = snapshot.data;
-              if (user != null && user.email == 'arasucrs2025@aec.org.in') {
-                return AdminHome();
-              } else {
-                return const HomePage();
-              }
-            } else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            } else {
-              return const Onboarding();
-            }
-          }
-
-          // Keep showing current page while waiting
-          return Container(color: Colors.transparent,);
-        },
-      ),
+      child: _buildMainContent(context),
     );
   }
-}
 
+  // Separate function to build the main content
+  Widget _buildMainContent(BuildContext context) {
+    // If offline at startup, show no internet page
+    if (isOffline && isInitializing) {
+      return const NoInternetPage();
+    }
+
+    // Only show loading on initial app launch
+    if (isInitializing) {
+      return const Scaffold(
+        backgroundColor: Color.fromARGB(255, 2, 15, 27),
+        body: Center(
+          child: Text(
+            'Loading...',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontFamily: "metropolis",
+            ),
+          ),
+        ),
+      );
+    }
+
+    // After initialization, check if the user is logged in
+    if (user != null) {
+      if (user?.email == 'arasucrs2025@aec.org.in') {
+        return AdminHome();
+      } else {
+        return const HomePage();
+      }
+    } else {
+      return const Onboarding();
+    }
+  }
+}
 
 class NoInternetPage extends StatelessWidget {
   const NoInternetPage({super.key});
@@ -215,4 +211,4 @@ class NoInternetPage extends StatelessWidget {
       ),
     );
   }
-}
+}  
