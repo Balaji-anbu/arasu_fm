@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:arasu_fm/AdminPages/admin_home.dart';
-import 'package:arasu_fm/Pages/home_page.dart';
+import 'package:arasu_fm/Pages/mainpage.dart';
 import 'package:arasu_fm/Pages/onboarding.dart';
 import 'package:arasu_fm/Providers/audio_provider.dart';
 import 'package:arasu_fm/Providers/video_provider.dart';
@@ -124,27 +124,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    // Intercept the back button using WillPopScope
-    return WillPopScope(
-      onWillPop: () async {
-        // Handle double-tap or Snackbar for exit
-        DateTime now = DateTime.now();
-        if (lastPressedTime == null ||
-            now.difference(lastPressedTime!) > const Duration(seconds: 1)) {
-          lastPressedTime = now;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Press back again to exit'),
-              duration: const Duration(seconds: 1),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-          return false; // Prevent exiting the app
-        }
-        return true; // Allow exiting the app
-      },
-      child: _buildMainContent(context),
-    );
+    return _buildMainContent(context);
   }
 
   // Separate function to build the main content
@@ -177,7 +157,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
       if (user?.email == 'arasucrs2025@aec.org.in') {
         return AdminHome();
       } else {
-        return const HomePage();
+        return const MainPage();
       }
     } else {
       return const Onboarding();
@@ -211,4 +191,4 @@ class NoInternetPage extends StatelessWidget {
       ),
     );
   }
-}  
+}
