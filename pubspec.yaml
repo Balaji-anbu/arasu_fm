@@ -66,6 +66,7 @@ dependencies:
   flutter_dotenv: ^5.2.1
   internet_connection_checker: ^3.0.1
   back_button_interceptor: ^8.0.3
+  introduction_screen: ^3.1.17
   
 
 dev_dependencies:

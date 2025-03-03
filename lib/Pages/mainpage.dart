@@ -14,7 +14,7 @@ class MainPage extends StatefulWidget {
   _MainPageState createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
@@ -30,7 +30,7 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  Widget _buildAudioOverlay(AudioProvider audioProvider) {
+ Widget _buildAudioOverlay(AudioProvider audioProvider) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -51,13 +51,31 @@ class _MainPageState extends State<MainPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          CircleAvatar(
-            radius: 25,
-            backgroundImage: NetworkImage(
-              audioProvider.currentAudio?.imageUrl ??
-                  "https://static.vecteezy.com/system/resources/thumbnails/000/583/157/small/wave_sound-15.jpg",
+          // Continuously spinning image when playing
+          if (audioProvider.isPlaying)
+            AnimatedBuilder(
+              animation: _rotationController..repeat(),
+              builder: (context, child) {
+                return Transform.rotate(
+                  angle: _rotationController.value * 2 * 3.14159,
+                  child: CircleAvatar(
+                    radius: 25,
+                    backgroundImage: NetworkImage(
+                      audioProvider.currentAudio?.imageUrl ??
+                          "https://static.vecteezy.com/system/resources/thumbnails/000/583/157/small/wave_sound-15.jpg",
+                    ),
+                  ),
+                );
+              },
+            )
+          else
+            CircleAvatar(
+              radius: 25,
+              backgroundImage: NetworkImage(
+                audioProvider.currentAudio?.imageUrl ??
+                    "https://static.vecteezy.com/system/resources/thumbnails/000/583/157/small/wave_sound-15.jpg",
+              ),
             ),
-          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -91,6 +109,23 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
+  // Add this to the State class
+  late AnimationController _rotationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _rotationController = AnimationController(
+      duration: const Duration(seconds: 3),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _rotationController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     final audioProvider = Provider.of<AudioProvider>(context);

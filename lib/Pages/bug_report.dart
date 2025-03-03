@@ -11,6 +11,7 @@ class _BugReportingPageState extends State<BugReportingPage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -21,26 +22,39 @@ class _BugReportingPageState extends State<BugReportingPage> {
   }
 
   Future<void> _submitBugReport() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        await FirebaseFirestore.instance.collection('Bugreports').add({
-          'title': _titleController.text,
-          'description': _descriptionController.text,
-          'email': _emailController.text.isNotEmpty ? _emailController.text : null,
-          'timestamp': FieldValue.serverTimestamp(),
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Bug report submitted successfully!')),
-        );
-        // Clear the form
-        _titleController.clear();
-        _descriptionController.clear();
-        _emailController.clear();
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to submit bug report: $e')),
-        );
-      }
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true; // Show loading indicator
+    });
+
+    try {
+      await FirebaseFirestore.instance.collection('bugreports').add({
+        'title': _titleController.text,
+        'description': _descriptionController.text,
+        'email': _emailController.text.isNotEmpty ? _emailController.text : null,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Bug report submitted successfully!')),
+      );
+
+      // Clear form
+      _titleController.clear();
+      _descriptionController.clear();
+      _emailController.clear();
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to submit bug report: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false; // Hide loading indicator
+      });
     }
   }
 
@@ -70,72 +84,75 @@ class _BugReportingPageState extends State<BugReportingPage> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildSectionCard(
-              title: 'We value your feedback!',
-              content: 'If you encounter any issues, please let us know so we can improve your experience.',
-            ),
-            _buildTextFieldCard(
-              title: 'Bug Title',
-              controller: _titleController,
-              hint: 'Enter the title of the bug',
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a title for the bug.';
-                }
-                return null;
-              },
-            ),
-            _buildTextFieldCard(
-              title: 'Bug Description',
-              controller: _descriptionController,
-              hint: 'Describe the bug in detail',
-              maxLines: 6,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please describe the bug.';
-                }
-                return null;
-              },
-            ),
-            _buildTextFieldCard(
-              title: 'Your Email (optional)',
-              controller: _emailController,
-              hint: 'Enter your email (optional)',
-              validator: (value) {
-                if (value != null &&
-                    value.isNotEmpty &&
-                    !RegExp(r"^[^@\s]+@[^@\s]+\.[^@\s]+\$").hasMatch(value)) {
-                  return 'Please enter a valid email address.';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 20),
-            Center(
-              child: ElevatedButton(
-                onPressed: _submitBugReport,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                  backgroundColor: Colors.greenAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildSectionCard(
+                title: 'We value your feedback!',
+                content: 'If you encounter any issues, please let us know so we can improve your experience.',
+              ),
+              _buildTextFieldCard(
+                title: 'Bug Title',
+                controller: _titleController,
+                hint: 'Enter the title of the bug',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a title for the bug.';
+                  }
+                  return null;
+                },
+              ),
+              _buildTextFieldCard(
+                title: 'Bug Description',
+                controller: _descriptionController,
+                hint: 'Describe the bug in detail',
+                maxLines: 6,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please describe the bug.';
+                  }
+                  return null;
+                },
+              ),
+              _buildTextFieldCard(
+                title: 'Your Email (optional)',
+                controller: _emailController,
+                hint: 'Enter your email (optional)',
+                validator: (value) {
+                  if (value != null &&
+                      value.isNotEmpty &&
+                      !RegExp(r"^[^@\s]+@[^@\s]+\.[^@\s]+$").hasMatch(value)) {
+                    return 'Please enter a valid email address.';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _submitBugReport,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                    backgroundColor: Colors.greenAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
                   ),
-                ),
-                child: const Text(
-                  'Submit Bug Report',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'metropolis',
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
+                  child: const Text(
+                    'Submit Bug Report',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'metropolis',
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

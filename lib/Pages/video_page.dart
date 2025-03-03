@@ -126,69 +126,68 @@ class _VideoPageState extends State<VideoPage> {
   Widget _buildVideoCard(Map<String, dynamic> video) {
     return GestureDetector(
       onTap: () {
-    showDialog(
-  barrierColor: const Color.fromARGB(255, 2, 15, 27),
-  barrierDismissible: false,
-  context: context,
-  builder: (_) {
-    final controller = YoutubePlayerController(
-      params: const YoutubePlayerParams(
-        showFullscreenButton: false,
-        showControls: true,
-        mute: false,
-      ),
-    )..loadVideoById(videoId: video['videoId']); // Load the video ID
-
-    return Dialog(
-      insetPadding: const EdgeInsets.all(8), // Adjust padding for the dialog
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [const SizedBox(height: 50,),
-              // Video Player Section
-              AspectRatio(
-                aspectRatio: 16 / 9,
-                child: YoutubePlayerScaffold(
-                  controller: controller,
-                  builder: (context, player) {
-                    return player;
-                  },
-                ),
+        showDialog(
+          barrierColor: const Color.fromARGB(255, 2, 15, 27),
+          barrierDismissible: false,
+          context: context,
+          builder: (_) {
+            final controller = YoutubePlayerController(
+              params: const YoutubePlayerParams(
+                showFullscreenButton: false,
+                showControls: true,
+                mute: false,
               ),
-              const SizedBox(height: 50),
-              // Title Section
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Text(
-                  video['title'],
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'metropolis',
+            )..loadVideoById(videoId: video['videoId']); // Load the video ID
+
+            return Dialog(
+              insetPadding: const EdgeInsets.all(8), // Adjust padding for the dialog
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: SingleChildScrollView(
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  textAlign: TextAlign.center,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 50),
+                      // Video Player Section
+                      AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: YoutubePlayerScaffold(
+                          controller: controller,
+                          builder: (context, player) {
+                            return player;
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 50),
+                      // Title Section
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text(
+                          video['title'],
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'metropolis',
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(height: 80),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 80),
-            ],
-          ),
-        ),
-      ),
-    );
-  },
-);
-
-
+            );
+          },
+        );
       },
       child: Card(
         color: Colors.grey[900],

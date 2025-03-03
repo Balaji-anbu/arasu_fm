@@ -3,31 +3,83 @@ import 'package:arasu_fm/main.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
   Widget build(BuildContext context) {
-    return  AnimatedSplashScreen(splash: 
-    Center(
-      child: Column(children: 
-      [const Text("Arasu FM 90.4 MHz",style: TextStyle(fontFamily: "metropolis",fontSize: 26,fontWeight: FontWeight.bold,color: Colors.white),),
-      const Text("Kumbakonam",style: TextStyle(fontFamily: "metropolis",fontSize: 20,fontWeight: FontWeight.bold,color: Color.fromARGB(137, 255, 255, 255)),),
-      const SizedBox(height: 30,),
-      Center( child: Lottie.asset("assets/splash.json"),),
-      const Spacer(),
-      const Text("Developed by",style: TextStyle(fontFamily: "metropolis", color: Colors.grey),),
-      const Text("NightSpace Technologies",style: TextStyle(fontFamily: "metropolis", color: Colors.grey,fontWeight: FontWeight.bold,fontSize: 18),)],),
-    ),
-     nextScreen: const AuthWrapper(),
-     splashIconSize: 600,backgroundColor:
-       const Color.fromARGB(255, 2, 15, 27),);
-  
-  
+    return SafeArea(
+      child: AnimatedSplashScreen(
+        splash: LayoutBuilder(
+          builder: (context, constraints) {
+            return Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Arasu FM 90.4 MHz",
+                      style: TextStyle(
+                        fontFamily: "metropolis",
+                        fontSize: constraints.maxWidth > 600 ? 36 : 26,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      "Kumbakonam",
+                      style: TextStyle(
+                        fontFamily: "metropolis",
+                        fontSize: constraints.maxWidth > 600 ? 28 : 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(137, 255, 255, 255),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: constraints.maxHeight * 0.05),
+                    Center(
+                      child: SizedBox(
+                        width: constraints.maxWidth > 600 
+                            ? constraints.maxWidth * 0.5 
+                            : constraints.maxWidth * 0.8,
+                        child: Lottie.asset(
+                          "assets/splash.json",
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: constraints.maxHeight * 0.2),
+                     Text(
+                      "Developed by",
+                      style: TextStyle(
+                        fontFamily: "metropolis", 
+                        color: Colors.grey,
+                         fontSize: constraints.maxWidth > 600 ? 16 : 14,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      "NightSpace Technologies",
+                      style: TextStyle(
+                        fontFamily: "metropolis", 
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                        fontSize: constraints.maxWidth > 600 ? 20 : 16,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        nextScreen: const AuthWrapper(),
+        splashIconSize: 800,
+        backgroundColor: const Color.fromARGB(255, 2, 15, 27),
+      ),
+    );
   }
 }
