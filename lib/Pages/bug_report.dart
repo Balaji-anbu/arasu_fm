@@ -11,7 +11,6 @@ class _BugReportingPageState extends State<BugReportingPage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -27,7 +26,7 @@ class _BugReportingPageState extends State<BugReportingPage> {
     }
 
     setState(() {
-      _isLoading = true; // Show loading indicator
+// Show loading indicator
     });
 
     try {
@@ -53,7 +52,7 @@ class _BugReportingPageState extends State<BugReportingPage> {
       );
     } finally {
       setState(() {
-        _isLoading = false; // Hide loading indicator
+// Hide loading indicator
       });
     }
   }

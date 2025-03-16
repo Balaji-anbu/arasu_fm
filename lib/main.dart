@@ -9,12 +9,12 @@ import 'package:arasu_fm/model/splash_screen_animation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:lottie/lottie.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
-
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +24,8 @@ Future<void> main() async {
     androidNotificationChannelName: 'Audio playback',
     androidNotificationOngoing: true,
   );
+  
+  await dotenv.load(fileName: ".env"); // Load environment variables
   OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
   OneSignal.initialize("43dcbfa9-f88c-41ce-aa91-8b13eefbbd81");
   OneSignal.Notifications.requestPermission(true);
@@ -40,18 +42,18 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => VideoProvider(
             apiKeys: [
-              'AIzaSyD-vzZytRgrxBKPa-vZCklh7jhQlOLKQ9c',
-              'AIzaSyBEj56vz8MecSel7FKQaHN2roQ1fWX2Cug',
-              'AIzaSyAVujyv2YYooGXfU569pdpUShfdacI5UaM',
-              'AIzaSyD4WBaJKHyiPr_kEquWy9k2Sef-2m0RvHQ',
-              'AIzaSyBNjFAWgXSHo2M0x0_kMyXnlfCk3wpH8Ls',
-              'AIzaSyAxBdQUi4WlO2NCfyE6pUrXyy1er38OIwQ',
-              'AIzaSyCto6HG50BqJgEwZkyfAEKHCXkvazcMa0I',
-              'AIzaSyAMPn9XVPddbVSxDFQCVTKAZzXGouj43rk',
-              'AIzaSyD0sUvYLGmBVA9AUALJerlL_N_AMLKSvHs',
-              'AIzaSyALPVfniig5lqcKoXYa8jRcaV8bh6Gwi5I',
+              dotenv.env['API_KEY_1']!,
+              dotenv.env['API_KEY_2']!,
+              dotenv.env['API_KEY_3']!,
+              dotenv.env['API_KEY_4']!,
+              dotenv.env['API_KEY_5']!,
+              dotenv.env['API_KEY_6']!,
+              dotenv.env['API_KEY_7']!,
+              dotenv.env['API_KEY_8']!,
+              dotenv.env['API_KEY_9']!,
+              dotenv.env['API_KEY_10']!,
             ],
-            channelId: 'UCdm4VTNKBzjVw0K37YCiKiA',
+            channelId: dotenv.env['CHANNEL_ID']!,
           ),
         ),
         ChangeNotifierProvider(create: (_) => AudioProvider()),
@@ -99,6 +101,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
   // Update connection status
   void _updateConnectionStatus(bool isConnected) {
+    if (!mounted) return; // Check if the widget is still mounted
     setState(() {
       isOffline = !isConnected;
     });
@@ -110,12 +113,14 @@ class _AuthWrapperState extends State<AuthWrapper> {
       User? currentUser = FirebaseAuth.instance.currentUser;
 
       // Set the user and stop initializing
+      if (!mounted) return; // Check if the widget is still mounted
       setState(() {
         user = currentUser;
         isInitializing = false;
       });
     } catch (e) {
       // Handle errors during auth state initialization
+      if (!mounted) return; // Check if the widget is still mounted
       setState(() {
         isInitializing = false;
       });
@@ -154,7 +159,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
     // After initialization, check if the user is logged in
     if (user != null) {
-      if (user?.email == 'arasucrs2025@aec.org.in') {
+      if (user?.email == dotenv.env['ADMIN_EMAIL']) { // Use environment variable
         return AdminHome();
       } else {
         return const MainPage();

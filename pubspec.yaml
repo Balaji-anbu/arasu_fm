@@ -67,7 +67,7 @@ dependencies:
   internet_connection_checker: ^3.0.1
   back_button_interceptor: ^8.0.3
   introduction_screen: ^3.1.17
-  
+  dotenv: ^4.2.0  
 
 dev_dependencies:
   flutter_test:
@@ -106,6 +106,7 @@ flutter:
         - asset: assets/Metropolis-SemiBold.otf
   assets:
     - assets/
+    - .env
 
 
 

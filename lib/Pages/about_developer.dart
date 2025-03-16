@@ -23,20 +23,7 @@ class AboutDeveloperPage extends StatelessWidget {
     }
   }
 
-  Future<void> _openGmailApp(String email) async {
-    final Uri gmailUri = Uri(
-      scheme: 'mailto',
-      path: email,
-      query: '', // Add additional fields like subject/body if needed
-    );
-
-    if (await canLaunchUrl(gmailUri)) {
-      await launchUrl(gmailUri);
-    } else {
-      throw 'Gmail app is not installed or could not open.';
-    }
-  }
-
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -171,7 +158,13 @@ class AboutDeveloperPage extends StatelessWidget {
                             width: 45,
                           ),
                           iconSize: 30,
-                          onPressed: () => _openGmailApp(email),
+                          onPressed: () async {
+                            final Uri emailLaunchUri = Uri(
+                              scheme: 'mailto',
+                              path: email,
+                            );
+                            await launch(emailLaunchUri.toString());
+                          },
                         ),
                       ],
                     ),

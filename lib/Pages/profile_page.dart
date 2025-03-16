@@ -3,6 +3,7 @@ import 'package:arasu_fm/Pages/about_fm.dart';
 import 'package:arasu_fm/Pages/bug_report.dart';
 import 'package:arasu_fm/Pages/fm_team.dart';
 import 'package:arasu_fm/Pages/onboarding.dart';
+import 'package:arasu_fm/Pages/policy.dart';
 import 'package:arasu_fm/Providers/audio_provider.dart';
 import 'package:arasu_fm/model/share_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -335,6 +336,12 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             );
           },
+        );
+      }),
+      _buildListTile('Terms & Privacy', Icons.policy, Colors.grey, () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => PolicyPage()),
         );
       }),
     ];
