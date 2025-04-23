@@ -1,26 +1,44 @@
 {
   "project_info": {
-    "project_number": "998918922748",
-    "project_id": "arasu-fm-8b744",
-    "storage_bucket": "arasu-fm-8b744.firebasestorage.app"
+    "project_number": "580670106943",
+    "project_id": "arasu-fm-latest",
+    "storage_bucket": "arasu-fm-latest.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:998918922748:android:9faf776e6efb86b2f95279",
+        "mobilesdk_app_id": "1:580670106943:android:231e5ab9716f9a2df3b78a",
         "android_client_info": {
-          "package_name": "com.example.arasu_fm"
+          "package_name": "com.arasu.arasu_fm"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "580670106943-dnsgqhtvehv1m38msska2bvettd2f6g8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.arasu.arasu_fm",
+            "certificate_hash": "053ba928e0440056bbc6abbccdc37e3e15ad289f"
+          }
+        },
+        {
+          "client_id": "580670106943-sqn2dqpr8jnr284lb6kv2kv9ufe14usk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyAoWFxG9i1PiTnlKeWXZTrZQR4VKSdLE1I"
+          "current_key": "AIzaSyBkw0soPEbSRW-KNrCWAz3In_TK-TjjwsI"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "580670106943-sqn2dqpr8jnr284lb6kv2kv9ufe14usk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

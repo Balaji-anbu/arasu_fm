@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:arasu_fm/Providers/video_provider.dart';
+import 'package:arasu_fm/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -46,13 +47,13 @@ class _VideoPageState extends State<VideoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 2, 15, 27),
+      backgroundColor: AppColors.primary,
       appBar: AppBar(
-        backgroundColor: const Color(0xff213555),
+        backgroundColor: AppColors.primary,
         title: const Text(
           'Watch Videos',
           style: TextStyle(
-            color: Colors.white,
+            color: AppColors.white,
             fontFamily: 'metropolis',
             fontWeight: FontWeight.bold,
           ),
@@ -80,7 +81,7 @@ class _VideoPageState extends State<VideoPage> {
                 const Text(
                   'Subscribe',
                   style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontFamily: "metropolis",
                       fontSize: 18,
                       fontWeight: FontWeight.bold),
@@ -127,7 +128,7 @@ class _VideoPageState extends State<VideoPage> {
     return GestureDetector(
       onTap: () {
         showDialog(
-          barrierColor: const Color.fromARGB(255, 2, 15, 27),
+          barrierColor: AppColors.primary,
           barrierDismissible: false,
           context: context,
           builder: (_) {
@@ -172,7 +173,7 @@ class _VideoPageState extends State<VideoPage> {
                         child: Text(
                           video['title'],
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'metropolis',
@@ -233,7 +234,7 @@ class _VideoPageState extends State<VideoPage> {
               child: Text(
                 video['title'],
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: AppColors.white,
                   fontFamily: "metropolis",
                   fontWeight: FontWeight.bold,
                   fontSize: 16,

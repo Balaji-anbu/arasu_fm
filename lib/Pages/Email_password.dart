@@ -1,4 +1,5 @@
 import 'package:arasu_fm/Pages/mainpage.dart';
+import 'package:arasu_fm/theme/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -39,13 +40,13 @@ class _EmailPasswordState extends State<EmailPassword> {
       content: const Text(
         'Please fill all the fields to continue...',
         style: TextStyle(
-          color: Colors.white,
+          color: AppColors.white,
           fontFamily: 'metropolis',
           fontWeight: FontWeight.bold,
         ),
       ),
       behavior: SnackBarBehavior.floating,
-      backgroundColor: Colors.red,
+      backgroundColor: AppColors.red,
       margin: const EdgeInsets.all(22.0),
       duration: const Duration(seconds: 2),
       shape: RoundedRectangleBorder(
@@ -63,16 +64,16 @@ class _EmailPasswordState extends State<EmailPassword> {
 
     return Scaffold(
       appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: AppColors.white),
         title: const Text(
           'Email Authentication',
           style: TextStyle(
-            color: Colors.white,
+            color: AppColors.white,
             fontFamily: 'metropolis',
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: const Color(0xff213555),
+        backgroundColor:AppColors.secondary,
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -87,8 +88,8 @@ class _EmailPasswordState extends State<EmailPassword> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Color(0xff213555),
-                      Color.fromARGB(255, 2, 15, 27),
+                      AppColors.secondary,
+                      AppColors.primary,
                     ],
                   ),
                 ),
@@ -101,7 +102,7 @@ class _EmailPasswordState extends State<EmailPassword> {
                       TextField(
                         controller: _usernameController,
                         decoration: _inputDecoration('User Name'),
-                        style: const TextStyle(color: Colors.white),
+                        style: const TextStyle(color: AppColors.white),
                         onChanged: (value) {
                           setState(() {});
                         },
@@ -110,7 +111,7 @@ class _EmailPasswordState extends State<EmailPassword> {
                       TextField(
                         controller: _emailController,
                         decoration: _inputDecoration('Email'),
-                        style: const TextStyle(color: Colors.white),
+                        style: const TextStyle(color: AppColors.white),
                         onChanged: (value) {
                           setState(() {});
                         },
@@ -124,7 +125,7 @@ class _EmailPasswordState extends State<EmailPassword> {
                               _obscurePassword
                                   ? Icons.visibility
                                   : Icons.visibility_off,
-                              color: Colors.white54,
+                              color: AppColors.textSecondary,
                             ),
                             onPressed: () {
                               setState(() {
@@ -133,7 +134,7 @@ class _EmailPasswordState extends State<EmailPassword> {
                             },
                           ),
                         ),
-                        style: const TextStyle(color: Colors.white),
+                        style: const TextStyle(color: AppColors.white),
                         obscureText: _obscurePassword,
                         onChanged: (value) {
                           setState(() {});
@@ -149,7 +150,7 @@ class _EmailPasswordState extends State<EmailPassword> {
                               _obscureConfirmPassword
                                   ? Icons.visibility
                                   : Icons.visibility_off,
-                              color: Colors.white54,
+                              color: AppColors.textSecondary,
                             ),
                             onPressed: () {
                               setState(() {
@@ -159,7 +160,7 @@ class _EmailPasswordState extends State<EmailPassword> {
                             },
                           ),
                         ),
-                        style: const TextStyle(color: Colors.white),
+                        style: const TextStyle(color: AppColors.white),
                         obscureText: _obscureConfirmPassword,
                         onChanged: (value) {
                           setState(() {});
@@ -174,7 +175,7 @@ class _EmailPasswordState extends State<EmailPassword> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Passwords do not match!'),
-                                  backgroundColor: Colors.red,
+                                  backgroundColor: AppColors.red,
                                 ),
                               );
                               return;
@@ -187,10 +188,11 @@ class _EmailPasswordState extends State<EmailPassword> {
                               );
                               print(
                                   'User registered: ${userCredential.user?.email}');
-                              Navigator.push(
+                              Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => const MainPage()),
+                                (route) => false,
                               );
                             } on FirebaseAuthException catch (e) {
                               String message;
@@ -207,7 +209,7 @@ class _EmailPasswordState extends State<EmailPassword> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(message),
-                                  backgroundColor: Colors.red,
+                                  backgroundColor: AppColors.red,
                                 ),
                               );
                             }
@@ -216,7 +218,7 @@ class _EmailPasswordState extends State<EmailPassword> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF1ED760),
+                          backgroundColor: AppColors.green,
                           padding: EdgeInsets.symmetric(
                             vertical: screenHeight * 0.02,
                             horizontal: screenWidth * 0.2,
@@ -228,7 +230,7 @@ class _EmailPasswordState extends State<EmailPassword> {
                         child: const Text(
                           'Continue',
                           style: TextStyle(
-                            color: Colors.black,
+                            color: AppColors.black,
                             fontSize: 18,
                             fontFamily: 'metropolis',
                             fontWeight: FontWeight.bold,
@@ -251,22 +253,22 @@ class _EmailPasswordState extends State<EmailPassword> {
     return InputDecoration(
       hintText: hintText,
       hintStyle: const TextStyle(
-        color: Colors.white54,
+        color: AppColors.textSecondary,
         fontFamily: 'metropolis',
       ),
       filled: true,
       fillColor: Colors.transparent,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Colors.white, width: 0.5),
+        borderSide: const BorderSide(color: AppColors.white, width: 0.5),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Colors.white, width: 0.5),
+        borderSide: const BorderSide(color: AppColors.white, width: 0.5),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Colors.white, width: 0.5),
+        borderSide: const BorderSide(color: AppColors.white, width: 0.5),
       ),
     );
   }

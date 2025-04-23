@@ -1,3 +1,4 @@
+import 'package:arasu_fm/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:share_plus/share_plus.dart';
@@ -50,7 +51,7 @@ class ShareAppButton extends StatelessWidget {
       icon: const Icon(
         Icons.share,
         size: 30,
-        color: Colors.white,
+        color: AppColors.textPrimary,
       ),
       iconSize: 40,
       onPressed: () async {

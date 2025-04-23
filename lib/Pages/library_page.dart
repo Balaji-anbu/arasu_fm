@@ -1,4 +1,5 @@
 import 'package:arasu_fm/Pages/audio_stream.dart';
+import 'package:arasu_fm/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,14 +17,14 @@ class LikedPodcastPage extends StatelessWidget {
 
     if (user == null) {
       return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 2, 15, 27),
+        backgroundColor: AppColors.primary,
         appBar: AppBar(
-          iconTheme: IconThemeData(color: Colors.white),
+          iconTheme: IconThemeData(color: AppColors.white),
           title: const Text(
             "Your's Library",
-            style: TextStyle(color: Colors.white,fontFamily: "metropolis"),
+            style: TextStyle(color: AppColors.white,fontFamily: "metropolis"),
           ),
-          backgroundColor: const Color(0xff213555),
+          backgroundColor: AppColors.secondary,
         ),
         body: const Center(
           child: Text(
@@ -40,13 +41,13 @@ class LikedPodcastPage extends StatelessWidget {
         .collection('liked_audios');
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 2, 15, 27),
+      backgroundColor: AppColors.primary,
       appBar: AppBar(
         title: const Text(
           "Your's Library",
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: AppColors.white),
         ),
-        backgroundColor: const Color(0xff213555),
+        backgroundColor: AppColors.primary,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: likedAudiosRef.snapshots(),
@@ -67,7 +68,7 @@ class LikedPodcastPage extends StatelessWidget {
                   const Text(
                     'Add a podcast to get started!',
                     style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.white,
                         fontFamily: 'metropolis',
                         fontSize: 18,
                         fontWeight: FontWeight.bold),
@@ -110,7 +111,7 @@ class LikedPodcastPage extends StatelessWidget {
                   margin:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: const Color(0xff213555),
+                    color: AppColors.secondary,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Padding(
@@ -126,18 +127,18 @@ class LikedPodcastPage extends StatelessWidget {
                           errorBuilder: (context, error, stackTrace) =>
                               const Icon(
                             Icons.image,
-                            color: Colors.grey,
+                            color: AppColors.textSecondary,
                           ),
                         ),
                       ),
                       title: Text(
                         podcast['title'] ?? 'Unknown Title',
-                        style: const TextStyle(color: Colors.white),
+                        style: const TextStyle(color: AppColors.white),
                       ),
                       trailing: IconButton(
                         icon: const Icon(
                           Icons.play_arrow,
-                          color: Colors.white,
+                          color: AppColors.white,
                         ),
                         onPressed: () {
                           final audioProvider = Provider.of<AudioProvider>(

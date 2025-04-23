@@ -1,5 +1,6 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:arasu_fm/main.dart';
+import 'package:arasu_fm/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -24,7 +25,7 @@ class SplashScreen extends StatelessWidget {
                         fontFamily: "metropolis",
                         fontSize: constraints.maxWidth > 600 ? 36 : 26,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -34,7 +35,7 @@ class SplashScreen extends StatelessWidget {
                         fontFamily: "metropolis",
                         fontSize: constraints.maxWidth > 600 ? 28 : 20,
                         fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(137, 255, 255, 255),
+                        color:AppColors.textSecondary,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -55,7 +56,7 @@ class SplashScreen extends StatelessWidget {
                       "Developed by",
                       style: TextStyle(
                         fontFamily: "metropolis", 
-                        color: Colors.grey,
+                        color: AppColors.textSecondary,
                          fontSize: constraints.maxWidth > 600 ? 16 : 14,
                       ),
                       textAlign: TextAlign.center,
@@ -64,7 +65,7 @@ class SplashScreen extends StatelessWidget {
                       "NightSpace Technologies",
                       style: TextStyle(
                         fontFamily: "metropolis", 
-                        color: Colors.grey,
+                        color: AppColors.textSecondary,
                         fontWeight: FontWeight.bold,
                         fontSize: constraints.maxWidth > 600 ? 20 : 16,
                       ),
@@ -78,7 +79,7 @@ class SplashScreen extends StatelessWidget {
         ),
         nextScreen: const AuthWrapper(),
         splashIconSize: 800,
-        backgroundColor: const Color.fromARGB(255, 2, 15, 27),
+        backgroundColor: AppColors.primary,
       ),
     );
   }

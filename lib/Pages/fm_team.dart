@@ -1,15 +1,16 @@
+import 'package:arasu_fm/theme/colors.dart';
 import 'package:flutter/material.dart';
 
 class TeamMembersPage extends StatelessWidget {
   final List<Map<String, String>> teamMembers = [
     {
-      'name': 'Dr. T. Balarmugan',
+      'name': 'Dr. T. Balamurugan',
       'position': 'Director',
       'image': 'assets/balamurugan.jpeg'
     },
     {
       'name': 'Dr. R. Vijayaragavan',
-      'position': 'Station Manager and Program Co-ordinator',
+      'position': 'Station Manager & \n Programme Co-ordinator',
       'image': 'assets/vijayaragavan.jpeg'
     },
     {
@@ -27,45 +28,47 @@ class TeamMembersPage extends StatelessWidget {
       'position': 'Sound Engineer',
       'image': 'assets/karthikeyan.jpeg'
     },
-    {
-      'name': 'Mrs. J. Hema',
-      'position': 'Broadcast Engineer',
-      'image': 'assets/hema.jpeg'
-    },
-    {
+     {
       'name': 'Mr. S. Kannan',
       'position': 'maintenance Engineer',
       'image': 'assets/kannan.jpeg'
     },
+    
     {
-      'name': 'Mrs. P. Monisha',
+      'name': 'Ms. P. Monisha',
       'position': 'Radio Jockey',
       'image': 'assets/monisha.jpeg'
     },
-    {
-      'name': 'Mr. R. Srivigneshwaran',
-      'position': 'Editor',
-      'image': 'assets/Srivigneshwaran.jpeg'
+     {
+      'name': 'Dr. K. Kalpana',
+      'position': 'Radio jockey',
+      'image': 'assets/Kalpana.jpg'
     },
-
     {
+      'name': 'Mrs. V. Muthumeenakshi',
+      'position': 'Broadcast Engineer',
+      'image': 'assets/Muthumeenakshi.jpg'
+    },
+     {
       'name': 'Mrs. A. Vinodhini',
-      'position': 'Senior Supporting Member',
+      'position': 'Station Supporting Member',
       'image': 'assets/vinodhini.jpeg'
-    },
-
-    {
-      'name': 'Mr. G. Venkatraman',
-      'position': 'Editor',
-      'image': 'assets/venkatraman.jpeg'
     },
     {
       'name': 'Dr. P. Iyyappan',
       'position': 'Station Supporting Member',
       'image': 'assets/iyyappan.jpeg'
     },
+   
+    {
+      'name': 'Ms. S. Vishnupriya ',
+      'position': 'Station Supporting Member',
+      'image': 'assets/Vishnupriya.jpg'
+    },
 
-    // Add more members here...
+       
+
+    
   ];
 
   @override
@@ -77,8 +80,8 @@ class TeamMembersPage extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xff213555),
-              Color.fromARGB(255, 2, 15, 27),
+             AppColors.secondary,
+              AppColors.primary,
             ],
           ),
         ),

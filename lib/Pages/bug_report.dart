@@ -1,3 +1,4 @@
+import 'package:arasu_fm/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -60,10 +61,10 @@ class _BugReportingPageState extends State<BugReportingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 2, 15, 27),
+      backgroundColor:AppColors.primary,
       appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: Colors.grey[900],
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        backgroundColor: AppColors.secondary,
         title: const Text(
           'Report Bug',
           style: TextStyle(
@@ -75,7 +76,7 @@ class _BugReportingPageState extends State<BugReportingPage> {
         actions: const [
           Icon(
             Icons.bug_report,
-            color: Colors.teal,
+            color: Color.fromARGB(255, 48, 199, 184),
             size: 34,
           ),
           SizedBox(width: 20),
@@ -159,7 +160,7 @@ class _BugReportingPageState extends State<BugReportingPage> {
 
   Widget _buildSectionCard({required String title, String? content, Widget? child}) {
     return Card(
-      color: Colors.grey[900],
+      color: AppColors.secondary,
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: Padding(
         padding: const EdgeInsets.all(16.0),

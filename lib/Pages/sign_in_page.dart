@@ -35,6 +35,9 @@ class SignInPage extends StatelessWidget {
         print('Failed to sign in with Google.');
         return null;
       }
+    } on FirebaseAuthException catch (e) {
+      print('FirebaseAuthException during Google sign-in: ${e.message}');
+      return null;
     } catch (e) {
       print('Error during Google sign-in: $e');
       return null;
@@ -80,22 +83,25 @@ class SignInPage extends StatelessWidget {
                     height: screenHeight * 0.2,
                   ),
                   SizedBox(height: screenHeight * 0.02),
-                  const Text(
+                  Text(
                     'Arasu Community Radio',
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 26,
-                        fontWeight: FontWeight.w900,
-                        fontFamily: 'Metropolis',
-                        letterSpacing: 2),
+                      color: Colors.white,
+                      fontSize: screenWidth * 0.06,
+                      fontWeight: FontWeight.w900,
+                      fontFamily: 'Metropolis',
+                      letterSpacing: screenWidth * 0.004,
+                      height: 1.2,
+                    ),
                   ),
-                  const Text(
+                  Text(
                     '90.4 MHz',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 24,
+                      fontSize: screenWidth * 0.055,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'Metropolis',
+                      height: 1.2,
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.05),
@@ -193,10 +199,13 @@ class SignInPage extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         'Already have an account?',
                         style: TextStyle(
-                            color: Colors.white, fontFamily: 'metropolis'),
+                          color: Colors.white,
+                          fontFamily: 'metropolis',
+                          fontSize: screenWidth * 0.035,
+                        ),
                       ),
                       TextButton(
                         onPressed: () {
@@ -205,64 +214,64 @@ class SignInPage extends StatelessWidget {
                               MaterialPageRoute(
                                   builder: (context) => const LoginPage()));
                         },
-                        child: const Text(
+                        child: Text(
                           'Login',
                           style: TextStyle(
                             color: Colors.blue,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Metropolis',
-                            fontSize: 16,
+                            fontSize: screenWidth * 0.04,
                           ),
                         ),
                       ),
                     ],
                   ),
                   SizedBox(height: screenHeight * 0.1),
-                 Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
-      child: Center(
-        child: Text.rich(
-          TextSpan(
-            text: 'By continuing, you agree to our ',
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-            children: [
-              WidgetSpan(
-                child: GestureDetector(
-                  onTap: () => _launchURL('https://app.websitepolicies.com/policies/view/yx35d2ql'),
-                  child: const Text(
-                    'Terms of Service',
-                    style: TextStyle(
-                      color: Colors.blueAccent,
-                      decoration: TextDecoration.underline,
-                      fontWeight: FontWeight.bold,
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
+                    child: Center(
+                      child: Text.rich(
+                        TextSpan(
+                          text: 'By continuing, you agree to our ',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: screenWidth * 0.033,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          children: [
+                            WidgetSpan(
+                              child: GestureDetector(
+                                onTap: () => _launchURL('https://app.websitepolicies.com/policies/view/yx35d2ql'),
+                                child: const Text(
+                                  'Terms of Service',
+                                  style: TextStyle(
+                                    color: Colors.blueAccent,
+                                    decoration: TextDecoration.underline,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const TextSpan(text: ' and '),
+                            WidgetSpan(
+                              child: GestureDetector(
+                                onTap: () => _launchURL('https://fluffy-syrniki-7d133d.netlify.app/'),
+                                child: const Text(
+                                  'Privacy Policy',
+                                  style: TextStyle(
+                                    color: Colors.blueAccent,
+                                    decoration: TextDecoration.underline,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  ),
-                ),
-              ),
-              const TextSpan(text: ' and '),
-              WidgetSpan(
-                child: GestureDetector(
-                  onTap: () => _launchURL('https://fluffy-syrniki-7d133d.netlify.app/'),
-                  child: const Text(
-                    'Privacy Policy',
-                    style: TextStyle(
-                      color: Colors.blueAccent,
-                      decoration: TextDecoration.underline,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    )
+                  )
                 ],
               ),
             ),

@@ -53,7 +53,7 @@ class PolicyPage extends StatelessWidget {
           Divider(thickness: 0.1, color: Colors.white),
           SizedBox(height: 20,),
           Text(
-            'App Version: 1.0.0',
+            'App Version: 2.2.0',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white,

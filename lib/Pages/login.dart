@@ -1,4 +1,5 @@
 import 'package:arasu_fm/Pages/mainpage.dart';
+import 'package:arasu_fm/Pages/sign_in_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -33,9 +34,10 @@ class _LoginPageState extends State<LoginPage> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const MainPage()),
+        (route) => false,
       );
     } on FirebaseAuthException catch (e) {
       String errorMessage;
@@ -225,7 +227,10 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) =>  SignInPage()),
+                    );
                   },
                   child: const Text(
                     "I don't have an account",

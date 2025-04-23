@@ -1,4 +1,4 @@
-package com.example.arasu_fm
+package com.arasu.arasu_fm
 
 import io.flutter.embedding.android.FlutterActivity
 

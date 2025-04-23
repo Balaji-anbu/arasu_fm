@@ -6,6 +6,7 @@ import 'package:arasu_fm/Pages/onboarding.dart';
 import 'package:arasu_fm/Pages/policy.dart';
 import 'package:arasu_fm/Providers/audio_provider.dart';
 import 'package:arasu_fm/model/share_model.dart';
+import 'package:arasu_fm/theme/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -79,13 +80,13 @@ class _ProfilePageState extends State<ProfilePage> {
     final toolbarHeight = size.height * 0.2;
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 2, 15, 27),
+      backgroundColor: AppColors.primary,
       body: Column(
         children: [
           Center(
             child: Container(
               height: toolbarHeight,
-              color: const Color.fromARGB(255, 2, 15, 27),
+              color:AppColors.primary,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -94,7 +95,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     height: 85,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2.0),
+                      border: Border.all(color: AppColors.white, width: 2.0),
                     ),
                     child: currentUser?.photoURL != null &&
                             currentUser!.photoURL!.isNotEmpty
@@ -128,7 +129,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             const Text(
                               'Signed in with',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 fontSize: 18,
                                 fontFamily: 'metropolis',
                                 fontWeight: FontWeight.bold,
@@ -139,7 +140,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               currentUser?.email ?? 'No Email',
                               style: const TextStyle(
                                 fontSize: 18,
-                                color: Colors.greenAccent,
+                                color: AppColors.green,
                                 fontFamily: 'metropolis',
                                 fontWeight: FontWeight.bold,
                               ),
@@ -152,14 +153,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                 'Report Bug',
                                 style: TextStyle(
                                   fontSize: 16,
-                                  color: Colors.red,
+                                  color: AppColors.red,
                                   fontFamily: 'metropolis',
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               leading: const Icon(
                                 Icons.bug_report,
-                                color: Colors.red,
+                                color: AppColors.red,
                               ),
                               onTap: () {
                                 Navigator.push(
@@ -175,14 +176,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                 'Logout',
                                 style: TextStyle(
                                   fontSize: 16,
-                                  color: Colors.red,
+                                  color: AppColors.red,
                                   fontFamily: 'metropolis',
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               leading: const Icon(
                                 Icons.exit_to_app,
-                                color: Colors.red,
+                                color: AppColors.red,
                               ),
                               onTap: () async {
                                 bool? shouldLogout = await showDialog<bool>(
@@ -192,11 +193,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                       backgroundColor: Colors.grey[900],
                                       title: const Text(
                                         'Confirm Logout',
-                                        style: TextStyle(color: Colors.white),
+                                        style: TextStyle(color: AppColors.white),
                                       ),
                                       content: const Text(
                                         'Are you sure you want to log out?',
-                                        style: TextStyle(color: Colors.white),
+                                        style: TextStyle(color: AppColors.white),
                                       ),
                                       actions: <Widget>[
                                         TextButton(
@@ -205,7 +206,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           child: const Text(
                                             'Cancel',
                                             style:
-                                                TextStyle(color: Colors.white),
+                                                TextStyle(color: AppColors.white),
                                           ),
                                         ),
                                         TextButton(
@@ -214,7 +215,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           child: const Text(
                                             'Logout',
                                             style:
-                                                TextStyle(color: Colors.red),
+                                                TextStyle(color: AppColors.red),
                                           ),
                                         ),
                                       ],
@@ -230,9 +231,9 @@ class _ProfilePageState extends State<ProfilePage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "App Version : 1.0.0",
+                                  "App Version : 2.2.0",
                                   style: TextStyle(
-                                      color: Colors.grey,
+                                      color: AppColors.textSecondary,
                                       fontFamily: "metropolis"),
                                 ),
                               ],
@@ -259,7 +260,7 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Text(
         initials,
         style: const TextStyle(
-          color: Colors.white,
+          color: AppColors.white,
           fontSize: 40,
           fontWeight: FontWeight.bold,
         ),
@@ -269,7 +270,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   List<Widget> _buildListItems() {
     return [
-    _buildListTile('Visit Website', Icons.web_asset, Colors.grey, () async {
+    _buildListTile('Visit Website', Icons.web_asset, AppColors.textSecondary, () async {
   try {
     String? url = await _getWebsiteLink(); // Fetch the website link
     if (url != null && url.isNotEmpty) {
@@ -289,22 +290,22 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }),
 
-      _buildListTile('About FM', Icons.info, Colors.grey, () {
+      _buildListTile('About FM', Icons.info, AppColors.textSecondary, () {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => AboutPage()));
       }),
-      _buildListTile('Our Team', Icons.people, Colors.grey, () {
+      _buildListTile('Our Team', Icons.people, AppColors.textSecondary, () {
         Navigator.push(context,
             MaterialPageRoute(builder: (context) =>  TeamMembersPage()));
       }),
       _buildListTile(
-          'About Developer', Icons.developer_mode_outlined, Colors.grey, () {
+          'About Developer', Icons.developer_mode_outlined, AppColors.textSecondary, () {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) =>  AboutDeveloperPage()),
         );
       }),
-      _buildListTile('Share App', Icons.share, Colors.grey, () {
+      _buildListTile('Share App', Icons.share, AppColors.textSecondary, () {
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -312,7 +313,7 @@ class _ProfilePageState extends State<ProfilePage> {
               backgroundColor: Colors.grey.shade900,
               title: const Text(
                 'Share App',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: AppColors.white),
               ),
               actions: <Widget>[
                 Row(
@@ -320,12 +321,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     const Text(
                       'Tap Here...',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: AppColors.white),
                     ),
                     IconButton(
                       icon: const Icon(
                         Icons.share,
-                        color: Colors.greenAccent,
+                        color: AppColors.green,
                       ),
                       onPressed: () {
                         ShareAppButton().shareApp();
@@ -338,7 +339,7 @@ class _ProfilePageState extends State<ProfilePage> {
           },
         );
       }),
-      _buildListTile('Terms & Privacy', Icons.policy, Colors.grey, () {
+      _buildListTile('Terms & Privacy', Icons.policy, AppColors.textSecondary, () {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => PolicyPage()),
@@ -354,7 +355,7 @@ class _ProfilePageState extends State<ProfilePage> {
         title,
         style: const TextStyle(
           fontSize: 16,
-          color: Colors.white,
+          color: AppColors.white,
           fontFamily: 'metropolis',
           fontWeight: FontWeight.bold,
         ),

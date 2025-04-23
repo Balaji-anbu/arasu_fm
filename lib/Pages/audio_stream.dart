@@ -1,5 +1,6 @@
 import 'package:arasu_fm/controllers/audio_control_button.dart';
 import 'package:arasu_fm/model/share_model.dart';
+import 'package:arasu_fm/theme/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -22,14 +23,35 @@ class AudioPlayerPage extends StatefulWidget {
 class _AudioPlayerPageState extends State<AudioPlayerPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
+  late Animation<double> _fadeInAnimation;
+  late Animation<double> _scaleAnimation;
+  late Animation<Offset> _slideUpAnimation;
 
   @override
   void initState() {
     super.initState();
+
     _animationController = AnimationController(
-      duration: const Duration(seconds: 5),
+      duration: const Duration(milliseconds: 1000),
       vsync: this,
-    )..repeat();
+    );
+
+    _fadeInAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+    );
+
+    _slideUpAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.2),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
+
+    _animationController.forward();
   }
 
   @override
@@ -75,70 +97,88 @@ ClipRRect(
     final screenHeight = screenSize.height;
 
     return Scaffold(
-      body: AnimatedContainer(
-        duration: const Duration(seconds: 1),
-        curve: Curves.easeInOut,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 60, 58, 58),
-              Color.fromARGB(255, 2, 15, 27),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SafeArea(
-          child: Consumer<AudioProvider>(
-            builder: (context, audioProvider, child) {
-              return Center(
-                child: Padding(
-                  padding: EdgeInsets.all(screenWidth * 0.05),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildNeonRunningBorderImage(audioProvider, screenHeight, screenWidth),
-                      const SizedBox(height: 16),
-                      Text(
-                        audioProvider.currentAudio?.title ?? widget.audioData.title,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: "metropolis",
-                          fontSize: screenWidth * 0.05,
+      body: AnimatedBuilder(
+        animation: _animationController,
+        builder: (context, child) {
+          return AnimatedContainer(
+            duration: const Duration(seconds: 1),
+            curve: Curves.easeInOut,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.secondary,
+                  AppColors.primary,
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            child: SafeArea(
+              child: FadeTransition(
+                opacity: _fadeInAnimation,
+                child: Consumer<AudioProvider>(
+                  builder: (context, audioProvider, child) {
+                    return Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(screenWidth * 0.05),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ScaleTransition(
+                              scale: _scaleAnimation,
+                              child: _buildNeonRunningBorderImage(audioProvider, screenHeight, screenWidth),
+                            ),
+                            const SizedBox(height: 16),
+                            SlideTransition(
+                              position: _slideUpAnimation,
+                              child: Column(
+                                children: [
+                                  Text(
+                                    audioProvider.currentAudio?.title ?? widget.audioData.title,
+                                    style: TextStyle(
+                                      color: AppColors.textPrimary,  
+                                    fontFamily: "metropolis",
+                                      fontSize: screenWidth * 0.05,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(
+                                          audioProvider.isLiked(widget.audioData)
+                                              ? Icons.my_library_books
+                                              : Icons.library_add,
+                                          size: 30,
+                                          color: audioProvider.isLiked(widget.audioData)
+                                              ? const Color.fromARGB(255, 36, 183, 196)
+                                              : AppColors.textPrimary,
+                                        ),
+                                        onPressed: () => audioProvider.toggleLike(),
+                                        iconSize: 40,
+                                      ),
+                                      SizedBox(width: screenWidth * 0.2),
+                                      ShareAppButton(),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  _buildProgressSlider(audioProvider),
+                                  const SizedBox(height: 20),
+                                  _buildControlButtons(audioProvider),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              audioProvider.isLiked(widget.audioData)
-                                  ? Icons.my_library_books
-                                  : Icons.library_add,
-                              size: 30,
-                              color: audioProvider.isLiked(widget.audioData)
-                                  ? const Color.fromARGB(255, 36, 183, 196)
-                                  : Colors.white,
-                            ),
-                            onPressed: () => audioProvider.toggleLike(),
-                            iconSize: 40,
-                          ),
-                          SizedBox(width: screenWidth * 0.2),
-                          ShareAppButton(),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      _buildProgressSlider(audioProvider),
-                      const SizedBox(height: 20),
-                      _buildControlButtons(audioProvider),
-                    ],
-                  ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
-        ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

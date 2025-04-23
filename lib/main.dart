@@ -6,6 +6,7 @@ import 'package:arasu_fm/Providers/audio_provider.dart';
 import 'package:arasu_fm/Providers/video_provider.dart';
 import 'package:arasu_fm/controllers/login_controller.dart';
 import 'package:arasu_fm/model/splash_screen_animation.dart';
+import 'package:arasu_fm/theme/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -39,21 +40,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (_) => VideoProvider(
+        ChangeNotifierProvider(   create: (context) => VideoProvider(
             apiKeys: [
-              dotenv.env['API_KEY_1']!,
-              dotenv.env['API_KEY_2']!,
-              dotenv.env['API_KEY_3']!,
-              dotenv.env['API_KEY_4']!,
-              dotenv.env['API_KEY_5']!,
-              dotenv.env['API_KEY_6']!,
-              dotenv.env['API_KEY_7']!,
-              dotenv.env['API_KEY_8']!,
-              dotenv.env['API_KEY_9']!,
-              dotenv.env['API_KEY_10']!,
+              'AIzaSyD-vzZytRgrxBKPa-vZCklh7jhQlOLKQ9c',
+              'AIzaSyBEj56vz8MecSel7FKQaHN2roQ1fWX2Cug',
+              'AIzaSyAVujyv2YYooGXfU569pdpUShfdacI5UaM',
+              'AIzaSyD4WBaJKHyiPr_kEquWy9k2Sef-2m0RvHQ',
+              'AIzaSyBNjFAWgXSHo2M0x0_kMyXnlfCk3wpH8Ls',
+              'AIzaSyAxBdQUi4WlO2NCfyE6pUrXyy1er38OIwQ',
+              'AIzaSyCto6HG50BqJgEwZkyfAEKHCXkvazcMa0I',
+              'AIzaSyAMPn9XVPddbVSxDFQCVTKAZzXGouj43rk',
+              'AIzaSyD0sUvYLGmBVA9AUALJerlL_N_AMLKSvHs',
+              'AIzaSyALPVfniig5lqcKoXYa8jRcaV8bh6Gwi5I',
             ],
-            channelId: dotenv.env['CHANNEL_ID']!,
+            channelId: 'UCdm4VTNKBzjVw0K37YCiKiA',
           ),
         ),
         ChangeNotifierProvider(create: (_) => AudioProvider()),
@@ -142,14 +142,14 @@ class _AuthWrapperState extends State<AuthWrapper> {
     // Only show loading on initial app launch
     if (isInitializing) {
       return const Scaffold(
-        backgroundColor: Color.fromARGB(255, 2, 15, 27),
+        backgroundColor: AppColors.primary,
         body: Center(
           child: Text(
             'Loading...',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppColors.white,
               fontFamily: "metropolis",
             ),
           ),
